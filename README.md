@@ -1,7 +1,7 @@
 # WORDRAIDERS — playable build
 
-A 3D word-building adventure that teaches how prefixes, roots, suffixes and combining forms give words
-their meaning, with a Word Arcade and Crystal Clash versus mode for playing with friends.
+A word quest for kids: nine chapters of word powers, chapter bosses, a Daily Raid that turns stars gold, and a
+certificate ending, plus a Word Arcade and Crystal Clash versus mode for playing with friends.
 
 **Play:** https://chiokebuckley-art.github.io/wordraiders/
 
