@@ -3,7 +3,8 @@
 A word quest for kids: nine chapters of word powers, chapter bosses, a Daily Raid that turns stars gold, and a
 certificate ending, plus a Word Arcade and Crystal Clash versus mode for playing with friends, player accounts
 with PINs, flashcards with a study box, and a Sentence Academy (5 units, 24 lessons, unit tests and a Sentence
-Master certificate) on how words, sentences, paragraphs and chapters are built.
+Master certificate) on how words, sentences, paragraphs and chapters are built, and a Sentence Arcade (tap the part of
+speech: Blitz, Mississippi Stud, Millionaire, Weakest Link) with statistics.
 
 **Play:** https://chiokebuckley-art.github.io/wordraiders/
 
