@@ -70,6 +70,17 @@ jobs:
           [ -n "$ID" ] || { echo "::error::Could not create or find the D1 database."; exit 1; }
           sed -i "s/__DATABASE_ID__/$ID/" wrangler.toml
           echo "id=$ID" >> "$GITHUB_OUTPUT"
+      - name: Make sure the account has a workers.dev address
+        run: |
+          API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/subdomain"
+          CUR=$(curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$API" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const r=JSON.parse(s);process.stdout.write(r.result&&r.result.subdomain?r.result.subdomain:"");}catch{}})')
+          if [ -n "$CUR" ]; then echo "workers.dev subdomain: $CUR"; exit 0; fi
+          for NAME in wordraiders wordraiders-sync wordraiders-$(echo "$CLOUDFLARE_ACCOUNT_ID" | cut -c1-6); do
+            OUT=$(curl -sS -X PUT -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" --data "{\"subdomain\":\"$NAME\"}" "$API")
+            if echo "$OUT" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const r=JSON.parse(s);process.exit(r.success?0:1);})'; then echo "Registered workers.dev subdomain: $NAME"; exit 0; fi
+            echo "Could not take '$NAME': $OUT"
+          done
+          echo "::error::Could not register a workers.dev subdomain with this token. Open https://dash.cloudflare.com/$CLOUDFLARE_ACCOUNT_ID/workers/onboarding once, pick any name, then re-run this workflow."; exit 1
       - name: Deploy the worker
         id: deploy
         working-directory: sync
