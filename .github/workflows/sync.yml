@@ -1,0 +1,68 @@
+# Deploys the cloud-sync Worker to the owner's free Cloudflare account and tells the game where it
+# lives. One-time setup: add the repository secrets CLOUDFLARE_API_TOKEN (a token made from the
+# "Edit Cloudflare Workers" template plus Account → D1 → Edit) and CLOUDFLARE_ACCOUNT_ID, then run
+# this workflow from the Actions tab. Re-run it any time sync/ changes.
+name: Cloud sync
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['sync/**', '.github/workflows/sync.yml']
+
+permissions:
+  contents: write
+
+concurrency: cloud-sync
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check the secrets are present
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Add the repository secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID first (see sync/README.md)."; exit 1; fi
+      - name: Install wrangler
+        run: npm install -g wrangler@4
+      - name: Create the database if it does not exist yet
+        id: db
+        working-directory: sync
+        run: |
+          ID=$(wrangler d1 list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const l=JSON.parse(s);const d=l.find(x=>x.name==="wordraiders-sync");process.stdout.write(d?d.uuid:"");})')
+          if [ -z "$ID" ]; then
+            wrangler d1 create wordraiders-sync
+            ID=$(wrangler d1 list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const l=JSON.parse(s);const d=l.find(x=>x.name==="wordraiders-sync");process.stdout.write(d?d.uuid:"");})')
+          fi
+          [ -n "$ID" ] || { echo "::error::Could not create or find the D1 database."; exit 1; }
+          sed -i "s/__DATABASE_ID__/$ID/" wrangler.toml
+          echo "id=$ID" >> "$GITHUB_OUTPUT"
+      - name: Deploy the worker
+        id: deploy
+        working-directory: sync
+        run: |
+          wrangler deploy 2>&1 | tee deploy.log
+          URL=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1)
+          [ -n "$URL" ] || { echo "::error::Deployed, but no workers.dev URL was printed. Check the Cloudflare dashboard."; exit 1; }
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          curl -fsS "$URL/healthz"
+      - name: Point the game at the worker (sync.json on main and gh-pages)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          printf '{"url":"%s"}\n' "${{ steps.deploy.outputs.url }}" > sync.json
+          git add sync.json && (git commit -m "Cloud sync: point the game at ${{ steps.deploy.outputs.url }}" || true) && git push origin HEAD:main
+          git fetch origin gh-pages && git checkout gh-pages
+          printf '{"url":"%s"}\n' "${{ steps.deploy.outputs.url }}" > sync.json
+          git add sync.json && (git commit -m "Cloud sync: point the game at ${{ steps.deploy.outputs.url }}" || true) && git push origin HEAD:gh-pages
+      - name: Done
+        run: echo "Cloud sync is live at ${{ steps.deploy.outputs.url }}. Open the game, Settings → Sync across devices → Turn on."

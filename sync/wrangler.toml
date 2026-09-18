@@ -1,0 +1,11 @@
+# WORDRAIDERS cloud sync worker. The deploy workflow fills in database_id; for a manual deploy run
+#   npx wrangler d1 create wordraiders-sync   → paste the id below, then   npx wrangler deploy
+name = "wordraiders-sync"
+main = "worker.mjs"
+compatibility_date = "2026-01-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "wordraiders-sync"
+database_id = "__DATABASE_ID__"

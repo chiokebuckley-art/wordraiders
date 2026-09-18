@@ -14,3 +14,6 @@ build, run `WORDS_BASE=/wordraiders/ npm run build:static` there and push `dist-
 `404.html` copy of `index.html`) to `gh-pages`. Progress is saved in your browser (use Settings → Export inside
 the game to move it between devices). On a phone, open the link and choose "Add to Home Screen" to install it
 like an app.
+
+**Sync across devices:** `sync/README.md` explains the one-time setup (a free Cloudflare account and two repository
+secrets, then run the *Cloud sync* workflow). After that, players link their devices with a sync code from Settings.
