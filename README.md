@@ -7,7 +7,7 @@ Master certificate) on how words, sentences, paragraphs and chapters are built, 
 speech: Blitz, Mississippi Stud, Millionaire, Weakest Link, online Sentence Clash, and a Mastery Drill over 58 grammar
 kinds, all nine pronoun kinds included) with statistics. Also inside: illustrated grammar lessons on a guided path,
 a Phonics & Decoding Academy, a Picture Academy, a Syntax Arcade and Conjugation Lab, Word Fishing, StoryForge, and a
-Word Forms & Adjectives arcade (plurals, irregular verbs, count and mass nouns, 300 adjectives, determiners) with an
+Word Forms & Adjectives arcade (plurals, irregular verbs, count and mass nouns, 300 adjectives, determiners, nine tenses) with an
 untimed Practice mode in every arcade.
 
 **Play:** https://chiokebuckley-art.github.io/wordraiders/
