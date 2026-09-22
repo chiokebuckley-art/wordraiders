@@ -4,7 +4,9 @@ A word quest for kids: nine chapters of word powers, chapter bosses, a Daily Rai
 certificate ending, plus a Word Arcade and Crystal Clash versus mode for playing with friends, player accounts
 with PINs, flashcards with a study box, and a Sentence Academy (5 units, 24 lessons, unit tests and a Sentence
 Master certificate) on how words, sentences, paragraphs and chapters are built, and a Sentence Arcade (tap the part of
-speech: Blitz, Mississippi Stud, Millionaire, Weakest Link, online Sentence Clash) with statistics.
+speech: Blitz, Mississippi Stud, Millionaire, Weakest Link, online Sentence Clash, and a Mastery Drill over 58 grammar
+kinds, all nine pronoun kinds included) with statistics. Also inside: illustrated grammar lessons on a guided path,
+a Phonics & Decoding Academy, a Picture Academy, a Syntax Arcade and Conjugation Lab, Word Fishing, and StoryForge.
 
 **Play:** https://chiokebuckley-art.github.io/wordraiders/
 
