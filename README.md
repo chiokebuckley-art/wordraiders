@@ -8,7 +8,11 @@ speech: Blitz, Mississippi Stud, Millionaire, Weakest Link, online Sentence Clas
 kinds, all nine pronoun kinds included) with statistics. Also inside: illustrated grammar lessons on a guided path,
 a Phonics & Decoding Academy, a Picture Academy, a Syntax Arcade and Conjugation Lab, Word Fishing, StoryForge, and a
 Word Forms & Adjectives arcade (plurals, irregular verbs, count and mass nouns, 300 adjectives, determiners, nine tenses, picture match) with an
-untimed Practice mode in every arcade.
+untimed Practice mode in every arcade. **Spelling Quest** (Quest tab → the Word Quest / Spelling Quest switch) is a
+second quest that teaches how English spelling works: 11 chapters and 56 spelling patterns, each with an animated
+concept picture and Echo the guide, 900 words checked against a pronunciation dictionary, chapter bosses, a Daily
+Spelling Raid with held-out new words, a word box for misses, a Spelling Arcade, and a grown-ups page with progress,
+mistake kinds and settings.
 
 **Play:** https://chiokebuckley-art.github.io/wordraiders/
 
