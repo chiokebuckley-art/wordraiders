@@ -1,7 +1,7 @@
-import {assets} from './assets.js';
-import {cameraLessons,dialogueQuestions} from './camera.js';
-import {coachPacks} from './coaches.js';
-import {newId,migrateProject,frame,seedFrames,sizes,angles,perspectives,moves,tactics,collectNotes,clipNote,appendDraft,useInScene,shotList,promptSheet} from './studio-model.js';
+import {assets} from './assets.js?v=20260926-studio2';
+import {cameraLessons,dialogueQuestions} from './camera.js?v=20260926-studio2';
+import {coachPacks} from './coaches.js?v=20260926-studio2';
+import {newId,migrateProject,frame,seedFrames,sizes,angles,perspectives,moves,tactics,collectNotes,clipNote,appendDraft,useInScene,shotList,promptSheet} from './studio-model.js?v=20260926-studio2';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const button=(text,action,id='',extra='')=>`<button class="btn small" data-studio-action="${action}" data-id="${esc(id)}" ${extra}>${text}</button>`;
 const field=(label,value,attrs,area=false)=>`<label class="studio-field"><span>${label}</span>${area?`<textarea ${attrs}>${esc(value)}</textarea>`:`<input ${attrs} value="${esc(value)}">`}</label>`;
