@@ -184,3 +184,5 @@ export const reviewItems=[
 ['practical','A manageable film','List essential cast, accessible places, props, sound, and any unresolved production challenge.'],
 ['time','Runtime checked','Record approximate read/staging duration, including pauses and action.']
 ];
+
+reviewItems.push(['coverage','Clear visual coverage','Cite how your frames establish geography and connect a cause to its reaction. If you deliberately withhold a view, explain why.'],['dialogueTactic','Dialogue pursues a want','Cite a tagged dialogue beat: what the character wants, the tactic used, and the resulting action. A purposeful silent beat counts.']);
