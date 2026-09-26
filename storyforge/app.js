@@ -1,10 +1,10 @@
-import {setupStudio,studioView as expandedStudioView,studioTabs,sceneTools,entryTools,arcadeEntries} from './studio.js';
-import {migrateProject,studioReport} from './studio-model.js';
-import {cameraGlossary} from './camera.js';
+import {setupStudio,studioView as expandedStudioView,studioTabs,sceneTools,entryTools,arcadeEntries} from './studio.js?v=20260926-studio2';
+import {migrateProject,studioReport} from './studio-model.js?v=20260926-studio2';
+import {cameraGlossary} from './camera.js?v=20260926-studio2';
 glossary.push(...cameraGlossary);
-import {acts,lessons,glossary,drills,sequences,reviewItems} from './curriculum.js';
-import {STORAGE_KEY,initialState,blankProfile,blankProject,blankScene,uid,countWords,shuffle,lessonReady,hasDraft,reviewReady,fountain,projectReport,validateState,formatWarnings} from './engine.js';
-import {example} from './example.js';
+import {acts,lessons,glossary,drills,sequences,reviewItems} from './curriculum.js?v=20260926-studio2';
+import {STORAGE_KEY,initialState,blankProfile,blankProject,blankScene,uid,countWords,shuffle,lessonReady,hasDraft,reviewReady,fountain,projectReport,validateState,formatWarnings} from './engine.js?v=20260926-studio2';
+import {example} from './example.js?v=20260926-studio2';
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let state,storageError='',recoveryRaw='';try{const raw=localStorage.getItem(STORAGE_KEY);state=raw?validateState(JSON.parse(raw)):initialState();}catch(e){try{recoveryRaw=localStorage.getItem(STORAGE_KEY)||'';}catch{}state=initialState();storageError='The saved data could not be opened. Export a recovery copy before continuing; your original save has not been overwritten.';}
 let screen='quest',mission=0,step=0,questionIndex=0,answerFeedback=null,studioTab='blueprint',game=null,drillIndex=null,timer=null,timerSeconds=0,timerRunning=false,toastTimer;

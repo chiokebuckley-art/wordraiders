@@ -1,5 +1,5 @@
-import {migrateProject,validateStudio} from './studio-model.js';
-import {lessons,reviewItems} from './curriculum.js';
+import {migrateProject,validateStudio} from './studio-model.js?v=20260926-studio2';
+import {lessons,reviewItems} from './curriculum.js?v=20260926-studio2';
 export const STORAGE_KEY='storyforge.v1';
 export const uid=()=>globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 export const blankScene=()=>({id:uid(),heading:'',action:'',dialogue:'',turn:'',frames:[],beats:[],sourceNotes:[]});
