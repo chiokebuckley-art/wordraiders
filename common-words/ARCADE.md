@@ -8,9 +8,11 @@ Practice is untimed; Blitz offers 30/60/90 seconds; Speed offers 10/20 items and
 
 Mastery is per meaning: all 50 objects, five practice patterns, five question types, both everyday situations, correct independent answers on at least three UTC dates, a perfect 20-item reserved-pattern check, and twenty latest distinct correct independent responses. A later miss or supported answer removes current mastery until repaired. Scores and crowns are separate. These game criteria are not a standardized language assessment.
 
-Arcade evidence and Conquer progress merge across devices; latest question evidence wins, with failure winning timestamp ties. Existing review records and completed Journey scenes are retained. WordRaiders stores Arcade under the active player's commonWords.arcade and its Academy Sync link opens the main game's player sync settings. The Engineering-hosted Academy includes Arcade in its existing independent AC-code sync. Those two hosts retain their separate save systems and codes.
+Arcade evidence and Conquer progress merge across devices; latest question evidence wins, with failure winning timestamp ties. Existing review records and completed Journey scenes are retained. WordRaiders stores Arcade under the active player's commonWords.arcade and its Academy Sync button opens an in-page panel using the same WordRaiders code. The panel can create a code, connect another device, sync now, and promote a guest to a player while retaining guest progress. The Engineering-hosted Academy includes Arcade in its existing independent AC-code sync. Those two hosts retain their separate save systems and codes.
 
 Checks performed: all 18,000 combinations and answer cardinality; no-repeat deck; unlock boundaries; reachable mastery and hint exclusion; compressed sync and concurrent evidence merge; native WordRaiders parse/merge/transport; mobile and desktop browser flows for modes, stations, timing, reload persistence, and Academy-to-main-game round trips.
 
 Engineering Academy regression command: node --test solving-english-problems/linguistics-quest/academy/*.test.mjs
 WordRaiders source regression: src/game/arcade-sync.test.ts (Vitest).
+
+Direct Academy sync regression: `node --test common-words/wordraiders-sync.test.mjs`. Browser verification covers two isolated devices, in-place Sync, profile linking, divergent progress, revision conflicts, offline failure/recovery, and guest promotion.
