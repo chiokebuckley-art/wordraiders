@@ -1,4 +1,4 @@
-import {createWordRaidersSync} from './wordraiders-sync.js';
+import {createWordRaidersSync} from './wordraiders-sync.js?v=3';
 import {createArcade} from './arcade.js';
 import {recordAnswer,DAY} from './engine.js';
 import {loadSave,saveBack} from './wordraiders-save.js';
