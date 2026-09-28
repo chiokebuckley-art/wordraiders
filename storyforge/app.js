@@ -122,3 +122,17 @@ setupStudio({project,profile,lessons,drills,acts,save,render,toast,download,slug
 function readRoute(){const parts=location.hash.slice(1).split('/');if(parts[0]==='lesson'&&Number.isInteger(Number(parts[1]))&&Number(parts[1])>=1&&Number(parts[1])<=24){screen='lesson';mission=Number(parts[1])-1;step=0;}else if(parts[0]==='studio'){screen='studio';studioTab=['blueprint','screenplay','screening','drafts',...studioTabs.map(([k])=>k)].includes(parts[1])?parts[1]:'blueprint';}else if(['quest','arcade','reference'].includes(parts[0]))screen=parts[0];}
 window.addEventListener('hashchange',()=>{readRoute();render();});
 readRoute();render();
+
+// Explicit, same-tab handoff from Word Estates. Creates a separate film; never replaces a draft.
+if(new URLSearchParams(location.search).get('estateImport')==='1'){
+ let seed=null;try{seed=JSON.parse(sessionStorage.getItem('wordraiders.estateStory.v1')||'null');}catch{}
+ if(seed&&typeof seed.id==='string'&&/^town-[a-z0-9-]+$/.test(seed.id)&&typeof seed.text==='string'&&seed.text.length<=16000){
+  modal(`<h2>Your Word Estates story</h2><p>Bring this town into a separate film project for <b>${esc(profile().name)}</b>. Your existing writing stays saved.</p><pre style="white-space:pre-wrap;max-height:40vh;overflow:auto">${esc(seed.text)}</pre><button class="btn primary" id="import-estate-story">Create my town film</button>`);
+  document.getElementById('import-estate-story').addEventListener('click',()=>{
+   if(recoveryRaw){toast('Export and resolve the recovery save before importing.');return;}
+   const source='word-estates:'+seed.id;let index=profile().projects.findIndex(p=>p.noteClips?.some(n=>n.source===source));
+   if(index<0){const film=blankProject('Word Estates — my town');film.noteClips.push({id:uid(),source,label:'My Word Estates town',text:seed.text});profile().projects.push(film);index=profile().projects.length-1;}
+   profile().project=index;if(!save())return;try{sessionStorage.removeItem('wordraiders.estateStory.v1');}catch{}history.replaceState(null,'',location.pathname+'#studio/story');closeModal();screen='studio';studioTab='story';render();toast('Your town is ready in Notes → Story.');
+  });
+ }else toast('The town story is not available in this tab. Return to Word Estates and open StoryForge again.');
+}
