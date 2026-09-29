@@ -1,5 +1,5 @@
 import {validateArcade,mergeArcade} from './arcade-model.js';
-import {foldClock,readClock} from '../journey-shared.js';
+import {foldClock,foldSeats,readClock} from '../journey-shared.js';
 // Progress lives in the active WordRaiders player's save (wordraiders.save.<id>, field commonWords), so it
 // follows the player across devices with cloud sync. Without a player (opened on its own) a guest save is used.
 const REGISTRY='wordraiders.players.v1';
@@ -18,8 +18,10 @@ export function saveBack(storage,save){
  const p=save.profiles[0];const raw=record(JSON.parse(storage.getItem(save.key)||'{}'));
  raw.commonWords={...record(raw.commonWords),version:1,completed:{...record(raw.commonWords?.completed),...p.academy.completed},checkpoint:p.academy.checkpoint,records:{...record(raw.commonWords?.records),...p.records},arcade:mergeArcade(raw.commonWords?.arcade,p.academy.arcade)};
  p.academy.arcade=raw.commonWords.arcade;
- // A real player's Journey time from this device's clock (docs/unified-journey.md §4). Never for the guest save, and
+ // A real player's Journey time (and time per seat) from this device's clock (docs/unified-journey.md §4). Never for the guest save, and
  // never creates a journey the learner has not begun.
- if(save.player){raw.xp=p.xp;if(raw.journey&&typeof raw.journey==='object'&&!Array.isArray(raw.journey))raw.journey=foldClock(raw.journey,readClock(storage,save.active));raw.savedAt=Date.now();}
+ if(save.player){raw.xp=p.xp;const clock=readClock(storage,save.active);if(raw.journey&&typeof raw.journey==='object'&&!Array.isArray(raw.journey))raw.journey=foldClock(raw.journey,clock);
+  // Time per seat (docs/progress.md §1): this page's slices are the 'common-words' seat.
+  const act=foldSeats(raw.activity&&typeof raw.activity==='object'&&!Array.isArray(raw.activity)?raw.activity:undefined,clock);if(act)raw.activity=act;raw.savedAt=Date.now();}
  storage.setItem(save.key,JSON.stringify(raw));
 }
