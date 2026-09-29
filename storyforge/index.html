@@ -1,1 +1,12 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#151c19"><meta name="description" content="Learn the craft. Play the challenges. Write your own short film."><title>StoryForge — Your first short film</title><link rel="icon" href="./icon.svg"><link rel="stylesheet" href="./style.css?v=20260926-studio2"></head><body><a class="skip" href="#main">Skip to workspace</a><div id="app"></div><div id="toast" role="status" aria-live="polite"></div><script type="module" src="./app.js?v=20260928-estates"></script></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#151c19"><meta name="description" content="Learn the craft. Play the challenges. Write your own short film."><title>StoryForge — Your first short film</title><link rel="icon" href="./icon.svg"><link rel="stylesheet" href="./style.css?v=20260926-studio2"></head><body><a class="skip" href="#main">Skip to workspace</a><div id="app"></div><div id="toast" role="status" aria-live="polite"></div><script type="module" src="./app.js?v=20260928-estates"></script><script type="module">
+// Journey time (docs/unified-journey.md §4): count active minutes for the active WordRaiders player, if there is one.
+import {startClock} from '../journey-shared.js';
+try{
+ const reg=JSON.parse(localStorage.getItem('wordraiders.players.v1')||'null'),id=reg&&typeof reg.active==='string'?reg.active:'';
+ if(id&&Array.isArray(reg.profiles)&&reg.profiles.some(p=>p&&p.id===id)){
+  const journey=()=>{try{const j=JSON.parse(localStorage.getItem('wordraiders.save.'+id)||'{}').journey;return j&&typeof j==='object'&&!Array.isArray(j)?j:null;}catch{return null;}};
+  const budgetSeconds=day=>{const j=journey();if(!j)return Infinity;const device=localStorage.getItem('wordraiders.device.v1');const today=j.time&&j.time[day]||{};let others=0;for(const [d,s] of Object.entries(today))if(d!==device&&Number.isFinite(s))others+=s;return (Number(j.budget)>0?Number(j.budget):60)*60-others;};
+  startClock({playerId:id,surface:'storyforge',budgetSeconds,onBudget:()=>{const t=document.querySelector('#toast');if(!t)return;t.textContent='Today’s Journey time is done — a good place to stop';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),8000);}});
+ }
+}catch{/* storage blocked: no Journey clock */}
+</script></body></html>
