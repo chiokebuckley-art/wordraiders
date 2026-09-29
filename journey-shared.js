@@ -58,15 +58,17 @@ function notYetPick(a,b){
  const out={...base};if(today)out.today=today;if(fixedAt)out.fixedAt=fixedAt;if(Object.keys(redone).length)out.redone=redone;return out;
 }
 /**
- * One pass record: the earliest `at` wins (a pass is latched). Its later-day retention (retainedAt with retainedScore)
- * travels separately: the earliest non-zero retainedAt of either copy, with its own score.
+ * One pass record: the earliest `at` wins (a pass is latched). Its later-day retention (retainedAt with retainedScore and
+ * retainedSeed) travels separately: the earliest non-zero retainedAt of either copy, with its own score and seed. A
+ * delayed-mastery stop's week-later check (delayedAt with delayedScore, R1-R6) travels the same way on its own.
  */
 function passPick(a,b){
  if(a===undefined&&b===undefined)return undefined;if(a===undefined)a=b;if(b===undefined)b=a;
- const strip=r=>{const o={...r};delete o.retainedAt;delete o.retainedScore;return o;};
- const ret=r=>num(r.retainedAt)?{retainedAt:r.retainedAt,...(r.retainedScore!==undefined?{retainedScore:r.retainedScore}:{})}:undefined;
- const base=earliest(strip(a),strip(b),atOf),kept=earliest(ret(a),ret(b),r=>num(r.retainedAt));
- return kept?{...base,...kept}:base;
+ const strip=r=>{const o={...r};delete o.retainedAt;delete o.retainedScore;delete o.retainedSeed;delete o.delayedAt;delete o.delayedScore;return o;};
+ const ret=r=>num(r.retainedAt)?{retainedAt:r.retainedAt,...(r.retainedScore!==undefined?{retainedScore:r.retainedScore}:{}),...(r.retainedSeed!==undefined?{retainedSeed:r.retainedSeed}:{})}:undefined;
+ const late=r=>num(r.delayedAt)?{delayedAt:r.delayedAt,...(r.delayedScore!==undefined?{delayedScore:r.delayedScore}:{})}:undefined;
+ const base=earliest(strip(a),strip(b),atOf),kept=earliest(ret(a),ret(b),r=>num(r.retainedAt)),week=earliest(late(a),late(b),r=>num(r.delayedAt));
+ return {...base,...(kept||{}),...(week||{})};
 }
 
 /** Keep the MAX_DAYS latest valid days and, per day, the MAX_DEVICES devices with the most seconds (clamped). */
