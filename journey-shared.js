@@ -43,16 +43,30 @@ function byKey(a,b,pick){
 }
 const atOf=r=>num(rec(r).at);
 /**
- * One not-yet record: the newer `at` wins. On equal `at` (the same failed check on two devices) the retry stays open if
- * either copy opened it (max fixedAt: fixing a not-yet adds fixedAt and keeps `at`) and the day's count is the larger
- * (max today). The rest is a deterministic pick made without those two fields, so merging again changes nothing.
+ * One not-yet record: the newer `at` wins. On equal `at` (the same failed check on two devices) the steps re-done on
+ * either copy all count (redone: union, latest time per step), the retry stays open if either copy opened it (max
+ * fixedAt: re-doing adds redone/fixedAt and keeps `at`) and the day's count is the larger (max today). The rest is a
+ * deterministic pick made without those fields, so merging again changes nothing.
  */
 function notYetPick(a,b){
- if(a===undefined)return b;if(b===undefined)return a;
- const x=atOf(a),y=atOf(b);if(x!==y)return x>y?a:b;
- const strip=r=>{const o={...r};delete o.fixedAt;delete o.today;return o;};
+ if(a===undefined&&b===undefined)return undefined;
+ // One side, or different failures: the newer record, in the same normal form as a same-failure merge.
+ if(a===undefined||b===undefined||atOf(a)!==atOf(b)){const r=a===undefined?b:b===undefined?a:atOf(a)>atOf(b)?a:b;return notYetPick(r,r);}
+ const strip=r=>{const o={...r};delete o.fixedAt;delete o.today;delete o.redone;return o;};
  const base=tie(strip(a),strip(b)),fixedAt=Math.max(num(a.fixedAt),num(b.fixedAt)),today=Math.max(num(a.today),num(b.today));
- const out={...base};if(today)out.today=today;if(fixedAt)out.fixedAt=fixedAt;return out;
+ const redone=byKey(a.redone,b.redone,(p,q)=>Math.max(num(p),num(q))||undefined);
+ const out={...base};if(today)out.today=today;if(fixedAt)out.fixedAt=fixedAt;if(Object.keys(redone).length)out.redone=redone;return out;
+}
+/**
+ * One pass record: the earliest `at` wins (a pass is latched). Its later-day retention (retainedAt with retainedScore)
+ * travels separately: the earliest non-zero retainedAt of either copy, with its own score.
+ */
+function passPick(a,b){
+ if(a===undefined&&b===undefined)return undefined;if(a===undefined)a=b;if(b===undefined)b=a;
+ const strip=r=>{const o={...r};delete o.retainedAt;delete o.retainedScore;return o;};
+ const ret=r=>num(r.retainedAt)?{retainedAt:r.retainedAt,...(r.retainedScore!==undefined?{retainedScore:r.retainedScore}:{})}:undefined;
+ const base=earliest(strip(a),strip(b),atOf),kept=earliest(ret(a),ret(b),r=>num(r.retainedAt));
+ return kept?{...base,...kept}:base;
 }
 
 /** Keep the MAX_DAYS latest valid days and, per day, the MAX_DEVICES devices with the most seconds (clamped). */
@@ -77,7 +91,7 @@ function maxTime(a,b){
 
 // ---------------------------------------------------------------- mergeJourney
 const KNOWN=new Set(['v','startedAt','start','startAt','placement','passes','demoted','notYet','attempts','electives','electivesAt',
- 'electivePasses','den','denAt','budget','budgetAt','time','seen','explain','paragraph','storyforgeName','storyforge','studied','certAt','last']);
+ 'electivePasses','den','denAt','budget','budgetAt','timedChecks','timedChecksAt','time','seen','explain','paragraph','storyforgeName','storyforge','studied','certAt','last']);
 
 const objOr=x=>isObj(x)?x:undefined;
 const objects=x=>{const out={};for(const [k,v] of Object.entries(rec(x)))if(isObj(v))out[k]=v;return out;};
@@ -91,6 +105,7 @@ function norm(j){
   budget:{budget:num(j.budget),budgetAt:num(j.budgetAt)},
   electives:{electives:Array.isArray(j.electives)?j.electives.filter(e=>typeof e==='string'):[],electivesAt:num(j.electivesAt)},
   den:{den:j.den===true,denAt:num(j.denAt)},
+  timedChecks:{timedChecks:j.timedChecks!==false,timedChecksAt:num(j.timedChecksAt)},
   explain:objOr(j.explain),paragraph:objOr(j.paragraph),last:objOr(j.last),
   storyforge:sf&&{done:num(sf.done),finisherAt:num(sf.finisherAt),at:num(sf.at)},
   storyforgeName:typeof j.storyforgeName==='string'?j.storyforgeName:undefined};
@@ -108,7 +123,7 @@ export function mergeJourney(a,b){
  // Unknown (future) fields survive: one side's value, or a deterministic pick when both differ.
  for(const k of new Set([...Object.keys(x),...Object.keys(y)]))if(!KNOWN.has(k)){const v=x[k]===undefined?y[k]:y[k]===undefined?x[k]:tie(x[k],y[k]);if(v!==undefined)out[k]=v;}
  out.v=1;
- const passPick=(p,q)=>earliest(p,q,atOf),minPick=(p,q)=>minNonZero(p,q);
+ const minPick=(p,q)=>minNonZero(p,q);
  out.passes=byKey(x.passes,y.passes,passPick);
  out.electivePasses=byKey(x.electivePasses,y.electivePasses,passPick);
  out.demoted=byKey(x.demoted,y.demoted,minPick);
@@ -123,6 +138,7 @@ export function mergeJourney(a,b){
  const bu=newer(x.budget,y.budget,s=>s.budgetAt);out.budget=bu.budget;out.budgetAt=bu.budgetAt;
  const el=newer(x.electives,y.electives,s=>s.electivesAt);out.electives=el.electives;out.electivesAt=el.electivesAt;
  const dn=newer(x.den,y.den,s=>s.denAt);out.den=dn.den;out.denAt=dn.denAt;
+ const tc=newer(x.timedChecks,y.timedChecks,s=>s.timedChecksAt);out.timedChecks=tc.timedChecks;out.timedChecksAt=tc.timedChecksAt;
  for(const k of ['explain','paragraph','last']){const v=newer(x[k],y[k],atOf);if(v!==undefined)out[k]=v;}
  const sx=x.storyforge,sy=y.storyforge;
  if(sx||sy){const p=sx||{},q=sy||{};out.storyforge={done:Math.max(num(p.done),num(q.done)),finisherAt:minNonZero(p.finisherAt,q.finisherAt),at:Math.max(num(p.at),num(q.at))};}
