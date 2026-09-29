@@ -5,7 +5,9 @@ export const MODES=['Practice','Blitz','Speed','Conquer'];
 const kinds=['picture','meaning','odd','swap','recall'];
 export const freshArcade=()=>({version:1,uses:{},bests:{},crowns:{},checks:{},conquer:{},speed:20});
 export const state=p=>{p.academy||={version:1,completed:{},checkpoint:null};return p.academy.arcade||(p.academy.arcade=freshArcade());};
-export const useState=(p,id)=>state(p).uses[id]||(state(p).uses[id]={cursor:0,evidence:{},recent:[]});
+/** Per-meaning practice record (cursor, evidence, recent). Not a React hook; `useState` stays as an alias for older importers. */
+export const meaningState=(p,id)=>state(p).uses[id]||(state(p).uses[id]={cursor:0,evidence:{},recent:[]});
+export const useState=meaningState;
 export function validateArcade(raw){
  if(raw===undefined)return freshArcade();
  if(!raw||raw.version!==1||typeof raw.uses!=='object'||!raw.uses||Array.isArray(raw.uses))throw Error('Invalid Arcade save.');
@@ -34,6 +36,17 @@ export function unlocked(p,lane,now=Date.now()){
  if(lane===8)return allowed.filter(i=>{const r=p.records['academy.'+USES[i].id];const a=state(p).uses[USES[i].id];return r?.repair||r?.due<=now||a?.recent.some(v=>!v[2])||(a&&Math.max(0,...Object.values(a.evidence).map(v=>v[0]))+86400000<=now);});
  return allowed;
 }
+// Arcade discipline (UJ-5): timed modes train what a unit's scene path has taught. A unit lane (0-5) opens Blitz,
+// Speed and Conquer only when all 10 of its meanings are unlocked (its 50 expedition-1 scenes), whatever the Explore
+// setting; other lanes only when every unit their pool draws on is complete. Explore adds untimed Practice only.
+export const TIMED_MODES=['Blitz','Speed','Conquer'];
+export function unitComplete(p,unit){const ids=USES.map((u,i)=>i).filter(i=>USES[i].unit===unit);return ids.length>0&&ids.every(i=>useUnlocked(p,i));}
+export function timedOpen(p,lane,pool=unlocked(p,lane)){
+ if(lane<6)return unitComplete(p,lane);
+ const units=[...new Set(pool.map(i=>USES[i].unit))];return units.length>0&&units.every(u=>unitComplete(p,u));
+}
+export const modeOpen=(p,lane,mode,pool)=>!TIMED_MODES.includes(mode)||timedOpen(p,lane,pool);
+export const modeLockReason=lane=>lane<6?'Finish this unit’s scene path first':'Finish the scene path for every unit here first';
 export function shuffle(items,seed){const a=[...items];let n=seed>>>0;for(let i=a.length-1;i>0;i--){n=(Math.imul(n,1664525)+1013904223)>>>0;const j=n%(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
 export function question(u,o,pattern,kind,seed=Date.now()){
  const s=sceneAt(sceneIndex(u,o)),text=sentence(u,o,pattern),key=`${kind}.${o}.${pattern}`;
@@ -48,7 +61,7 @@ export function question(u,o,pattern,kind,seed=Date.now()){
 }
 export function nextQuestion(p,lane,serial,{use=null,object=null,assessment=false,kind=null}={}){
  const pool=use===null?unlocked(p,lane):[use];if(!pool.length)return null;
- const u=pool[serial%pool.length],r=useState(p,USES[u].id),count=r.cursor++;
+ const u=pool[serial%pool.length],r=meaningState(p,USES[u].id),count=r.cursor++;
  let o,pat,k;
  if(assessment){const deck=shuffle(Array.from({length:50},(_,i)=>i),8191+u);o=deck[count%50];pat=5;k=kinds[count%kinds.length];}
  else {const size=1252,n=(count*977+u*37)%size;if(n>=1250){o=n-1250;pat=0;k='transfer';}else{o=n%50;pat=Math.floor(n/50)%5;k=kinds[Math.floor(n/250)%5];}}
@@ -58,9 +71,9 @@ export function nextQuestion(p,lane,serial,{use=null,object=null,assessment=fals
  return question(u,o,pat,k,Math.floor(Math.random()*2147483647));
 }
 export function record(p,q,{correct,hinted=false,now=Date.now()}){
- const r=useState(p,USES[q.u].id),clean=correct&&!hinted;r.evidence[q.key]=[now,clean?1:0];r.recent=[...r.recent,[q.key,now,clean?1:0]].slice(-20);return clean;
+ const r=meaningState(p,USES[q.u].id),clean=correct&&!hinted;r.evidence[q.key]=[now,clean?1:0];r.recent=[...r.recent,[q.key,now,clean?1:0]].slice(-20);return clean;
 }
-export function mastery(p,u){const a=state(p),r=useState(p,USES[u].id),good=Object.entries(r.evidence).filter(([,v])=>v[1]),objects=new Set(),patterns=new Set(),types=new Set(),days=new Set();
+export function mastery(p,u){const a=state(p),r=meaningState(p,USES[u].id),good=Object.entries(r.evidence).filter(([,v])=>v[1]),objects=new Set(),patterns=new Set(),types=new Set(),days=new Set();
  for(const [key,v] of good){const [kind,o,pattern]=key.split('.');if(kind!=='transfer'){objects.add(Number(o));if(Number(pattern)<5)patterns.add(Number(pattern));types.add(kind);}days.add(new Date(v[0]).toISOString().slice(0,10));}
  const transfers=good.filter(([k])=>k.startsWith('transfer.')).length,check=a.checks[USES[u].id];const recent=r.recent.length===20&&r.recent.every(v=>v[2])&&new Set(r.recent.map(v=>v[0])).size===20;
  const gates=[objects.size===50,patterns.size===5,types.size===5,days.size>=3,transfers>=2,!!check?.pass&&check.score===20&&recent];
