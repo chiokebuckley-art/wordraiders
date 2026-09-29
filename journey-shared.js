@@ -10,6 +10,8 @@ export const IDLE_MS=90000;
 const DAY_SECONDS=86400,MAX_DAYS=120,MAX_DEVICES=8,ROLLOVER_HOURS=3;
 const DEVICE_KEY='wordraiders.device.v1',CLOCK_PREFIX='wordraiders.clock.';
 const DAY_RE=/^\d{4}-\d{2}-\d{2}$/,DEVICE_RE=/^[A-Za-z0-9_-]{1,64}$/;
+/** Where time was spent (docs/progress.md §1): a seat or screen key such as 'spelling', 'arcade' or 'journey:P7'. */
+const SEAT_RE=/^[A-Za-z0-9:_-]{1,32}$/,MAX_SEATS=32;
 const INPUTS=['pointerdown','keydown','input','change','wheel'];
 
 const isObj=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
@@ -169,10 +171,18 @@ export function deviceId(storage){
  try{storage.setItem(DEVICE_KEY,id);}catch{/* keep the in-memory id */}
  return id;
 }
+/** One day's seconds per seat: valid keys, whole seconds 1..86,400, the MAX_SEATS largest. */
+function cleanSeats(row){
+ const out=Object.entries(rec(row)).filter(([k,v])=>SEAT_RE.test(k)&&num(v)>=1).map(([k,v])=>[k,Math.min(DAY_SECONDS,Math.floor(v))])
+  .sort((p,q)=>q[1]-p[1]||(p[0]<q[0]?-1:1)).slice(0,MAX_SEATS);
+ return Object.fromEntries(out.sort((p,q)=>p[0]<q[0]?-1:1));
+}
 function cleanClock(raw,device){
- const x=rec(raw),days={};
+ const x=rec(raw),days={},seats={};
  for(const d of Object.keys(rec(x.days)).filter(k=>DAY_RE.test(k)).sort().slice(-MAX_DAYS)){const s=Math.min(DAY_SECONDS,Math.floor(num(x.days[d])));if(s)days[d]=s;}
+ for(const d of Object.keys(rec(x.seats)).filter(k=>DAY_RE.test(k)&&days[k]).sort()){const row=cleanSeats(x.seats[d]);if(Object.keys(row).length)seats[d]=row;}
  const out={v:1,device:typeof x.device==='string'&&DEVICE_RE.test(x.device)?x.device:device,days};
+ if(Object.keys(seats).length)out.seats=seats;
  const l=rec(x.last);if(num(l.at))out.last={at:num(l.at),surface:String(l.surface||'').slice(0,40),href:String(l.href||'').slice(0,500)};
  return out;
 }
@@ -195,6 +205,54 @@ export function foldClock(journey,clock){
  return {...journey,time:maxTime(journey.time,add)};
 }
 
+// ---------------------------------------------------------------- time per seat (docs/progress.md §1)
+/** Keep the MAX_DAYS latest valid days; per day the MAX_DEVICES devices with the most seconds; per device clean seats. */
+function pruneSeatTime(sec){
+ const t=rec(sec),out={};
+ for(const d of Object.keys(t).filter(k=>DAY_RE.test(k)).sort().slice(-MAX_DAYS)){
+  const devs=Object.entries(rec(t[d])).filter(([k])=>DEVICE_RE.test(k)).map(([k,v])=>[k,cleanSeats(v)]).filter(([,v])=>Object.keys(v).length)
+   .map(([k,v])=>[k,v,Object.values(v).reduce((a,b)=>a+b,0)]).sort((p,q)=>q[2]-p[2]||(p[0]<q[0]?-1:1)).slice(0,MAX_DEVICES);
+  if(devs.length)out[d]=Object.fromEntries(devs.map(([k,v])=>[k,v]).sort((p,q)=>p[0]<q[0]?-1:1));
+ }
+ return out;
+}
+/** Merge two activity.sec maps ({day:{device:{seat:seconds}}}): max per day, device and seat. Idempotent, commutative. */
+export function mergeSeatTime(a,b){
+ const x=rec(a),y=rec(b),out={};
+ for(const d of new Set([...Object.keys(x),...Object.keys(y)])){
+  const dx=rec(x[d]),dy=rec(y[d]),day={};
+  for(const dev of new Set([...Object.keys(dx),...Object.keys(dy)])){
+   const sx=rec(dx[dev]),sy=rec(dy[dev]),row={};
+   for(const k of new Set([...Object.keys(sx),...Object.keys(sy)]))row[k]=Math.max(num(sx[k]),num(sy[k]));
+   day[dev]=row;
+  }
+  out[d]=day;
+ }
+ return pruneSeatTime(out);
+}
+/**
+ * Fold a clock into activity.sec (max per day, device and seat). Seconds the clock counted without a seat (before seats
+ * were tracked) go to 'other', so a day's seats always add up to the clock's day. Pure and idempotent; returns a new
+ * activity ({v:1, sec, ...} is created when missing and the clock has time), or the input when the clock is unusable.
+ */
+export function foldSeats(activity,clock){
+ const c=isObj(clock)?clock:null;
+ if(!c||typeof c.device!=='string'||!DEVICE_RE.test(c.device))return activity;
+ const add={},had=rec(isObj(activity)?activity.sec:undefined);
+ for(const [d,s] of Object.entries(rec(c.days))){
+  const total=Math.min(DAY_SECONDS,Math.floor(num(s)));if(!DAY_RE.test(d)||!total)continue;
+  // Seats already folded count as used even when this clock lost them (a page with an older copy of this file rewrote
+  // the clock without seats), so 'other' never pushes a device's day past the clock's day.
+  const row=cleanSeats(rec(c.seats)[d]),old=rec(rec(had[d])[c.device]);let used=0;
+  for(const k of new Set([...Object.keys(row),...Object.keys(old)]))if(k!=='other')used+=Math.max(num(row[k]),num(old[k]));
+  if(total>used)row.other=total-used;
+  add[d]={[c.device]:row};
+ }
+ if(!Object.keys(add).length)return activity;
+ const base=isObj(activity)?activity:{v:1};
+ return {...base,v:1,sec:mergeSeatTime(base.sec,add)};
+}
+
 // ---------------------------------------------------------------- startClock
 /**
  * Count active time for a WordRaiders player on this device. Every CLOCK_SLICE seconds a slice of exactly CLOCK_SLICE
@@ -205,7 +263,7 @@ export function foldClock(journey,clock){
  */
 export function startClock(opts={}){
  const g=globalThis;
- const {playerId,surface='',storage=g.localStorage,doc=g.document,win=g.window,now=()=>Date.now(),onBudget,budgetSeconds}=opts;
+ const {playerId,surface='',storage=g.localStorage,doc=g.document,win=g.window,now=()=>Date.now(),onBudget,budgetSeconds,seat}=opts;
  const isSpeaking=opts.isSpeaking||(()=>!!(win&&win.speechSynthesis&&win.speechSynthesis.speaking));
  const noop={stop(){},read(){return null;}};
  if(!playerId||!storage||!doc||!win)return noop;
@@ -219,7 +277,11 @@ export function startClock(opts={}){
  function credit(t){
   // Read-modify-write so two tabs of the same player add up instead of overwriting each other.
   const c=load(),day=journeyDay(t),before=c.days[day]||0,after=Math.min(DAY_SECONDS,before+CLOCK_SLICE);
-  c.days[day]=after;c.last={at:t,surface,href:href()};write(cleanClock(c,device));
+  c.days[day]=after;c.last={at:t,surface,href:href()};
+  // The slice also goes to the current seat (a function of the page's state, or the surface) when it is a valid key.
+  let where=surface;if(typeof seat==='function'){try{where=seat();}catch{where=surface;}}else if(typeof seat==='string')where=seat;
+  if(after>before&&typeof where==='string'&&SEAT_RE.test(where)){const seats=rec(c.seats),row=rec(seats[day]);row[where]=Math.min(DAY_SECONDS,num(row[where])+after-before);seats[day]=row;c.seats=seats;}
+  write(cleanClock(c,device));
   const budget=budgetFor(day);
   if(typeof onBudget==='function'&&firedDay!==day&&before<budget&&after>=budget){firedDay=day;try{onBudget(day,after);}catch{/* never break the clock */}}
  }
