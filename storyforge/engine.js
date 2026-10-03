@@ -1,5 +1,5 @@
-import {migrateProject,validateStudio} from './studio-model.js?v=20260926-studio2';
-import {lessons,reviewItems} from './curriculum.js?v=20260926-studio2';
+import {migrateProject,validateStudio,livingPageText} from './studio-model.js?v=20261003-production';
+import {lessons,reviewItems} from './curriculum.js?v=20261003-production';
 export const STORAGE_KEY='storyforge.v1';
 export const uid=()=>globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 export const blankScene=()=>({id:uid(),heading:'',action:'',dialogue:'',turn:'',frames:[],beats:[],sourceNotes:[]});
@@ -8,7 +8,7 @@ export const blankProfile=(name='Writer')=>({id:uid(),name,progress:{},drills:{}
 export const initialState=()=>({version:2,active:0,profiles:[blankProfile()]});
 export const countWords=t=>(t?.trim().match(/\S+/g)||[]).length;
 export const shuffle=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;};
-export function lessonReady(lesson,progress,project){return lesson.questions.every((_,i)=>progress?.answers?.[i]===true)&&countWords(project.fields[lesson.field])>=8&&lesson.checks.every((_,i)=>progress?.checks?.[i]===true)&&(lesson.id!==19||hasDraft(project))&&(lesson.id!==23||reviewReady(project));}
+export function lessonReady(lesson,progress,project){return (progress?.complete||progress?.exampleMarked===true)&&lesson.questions.every((_,i)=>progress?.answers?.[i]===true)&&countWords(project.fields[lesson.field])>=8&&lesson.checks.every((_,i)=>progress?.checks?.[i]===true)&&(lesson.id!==19||hasDraft(project))&&(lesson.id!==23||reviewReady(project));}
 export const hasDraft=p=>p.scenes.length>0&&p.scenes.every(s=>s.heading.trim()&&s.action.trim())&&p.scenes.some(s=>s.action.trim().length>0);
 export const reviewReady=p=>hasDraft(p)&&p.snapshots.length>0&&['readNotes','revision','pitch'].every(k=>countWords(p.fields[k])>=8)&&reviewItems.every(([k])=>countWords(p.review[k])>=6);
 export function fountain(p,author=''){
@@ -30,3 +30,11 @@ export function validateState(s){
 export function formatWarnings(p){
  const list=[];p.scenes.forEach((s,i)=>{if(!/^(INT\.?|EXT\.?|INT\.?\/EXT\.?|I\/E)\s+/i.test(s.heading))list.push(`Scene ${i+1}: use a heading such as INT. KITCHEN - DAY.`);if(!s.action.trim())list.push(`Scene ${i+1}: add visible or audible action.`);if(s.dialogue.trim()&&!/^[A-Z][A-Z\s.'()\-0-9]+$/m.test(s.dialogue))list.push(`Scene ${i+1}: put an uppercase speaker name on its own line before speech.`);});return list;
 }
+
+export function missionSnapshot(p,mission,author=''){
+ const isFountain=hasDraft(p);const take={id:uid(),date:new Date().toISOString(),mission,format:isFountain?'fountain':'text',script:isFountain?fountain(p,author):livingPageText(p)};
+ p.snapshots.push(take);return take;
+}
+export const reviewContentReady=p=>hasDraft(p)&&['readNotes','revision','pitch'].every(k=>countWords(p.fields[k])>=8)&&reviewItems.every(([k])=>countWords(p.review[k])>=6);
+export function ensureReviewSnapshot(p,author=''){if(!p.snapshots.length&&reviewContentReady(p)){missionSnapshot(p,23,author);return true;}return false;}
+export function savedTime(p){return Number.isFinite(p.updated)?new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',hour:'numeric',minute:'2-digit'}).format(new Date(p.updated)):null;}

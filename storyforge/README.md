@@ -54,3 +54,13 @@ Uploads accept PNG/JPEG/WebP up to 2 MB, decode and redraw locally to strip meta
 Shareable routes: `#lesson/1` through `#lesson/24`, `#studio/story`, `#studio/storyboard`, and other studio tabs. Links open a workspace on the recipient's own local project; they do not share private writing.
 
 `assets/*.svg` is original geometric planning artwork created for this project, released under CC0. It is intentionally schematic, not production photography.
+
+## Teach → land → save (October 2026)
+
+The same 24 mission fields now render a living production board. Examples require a mark before new mission completions. Completing a mission preserves a labeled snapshot even without scene headings; screenplay-ready takes retain Fountain formatting. A direct capstone entry automatically preserves a take once all existing draft and review evidence gates pass.
+
+Mission 13 adopts only a blank starter scene and creates one linked frame. Manual scene text is preserved, with an explicit replacement control that keeps the former action as a source note. Generated action and captions follow later mission edits only while still equal to their last generated value. Mission 14 sets the same frame's angle. Scene plans accept one line per card and explicit scene headings or `Kitchen: ...` place labels; unparsed prose remains visible on the board. Source text is never discarded. Existing scene cards are not deleted when a plan is shortened.
+
+The slate shows the last successful save time in America/Chicago, a This browser chip, and the local-only storage explanation. Quota and corrupt-save guards remain in place. In-app routes push history; Back and Forward restore screens without discarding project state. The Journey clock is unchanged.
+
+Navigation is organized into Writer’s room, Storyboard wall, Camera bay, and Editing bay. Existing notes, arcade, cast, coaching, glossary, uploads, backup, and Fountain tools remain available. Shot words is a reference drawer in Camera bay.
