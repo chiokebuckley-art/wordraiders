@@ -1,11 +1,10 @@
 /**
- * WordRaiders Cinematic Intro Video (v4 - Native HD MP4 Video with Animated Runner)
- * - Real 1080p/720p H.264 Video: The character visibly runs with dynamic limb strides, cape physics, and footstep shockwaves.
- * - 16:9 Responsive Theater: Never crops on mobile screens; fits 100% cleanly on any device.
- * - Ambient Cyber Backlight: Soft glow fills vertical space on portrait phones (Apple TV / Netflix mobile style).
- * - Synchronized Subtitle Captions with narrative highlights.
+ * WordRaiders Cinematic Intro Video & Voiceover (v5 - Universal iOS & Desktop Support)
+ * - iOS Safari Compatible: Muted video stream starts instantly; crystal-clear audio syncs via HTML5 Audio.
+ * - Tap to Unmute / Start: 1-tap enables studio audio on iPhone without getting blocked by Safari.
+ * - 16:9 Contained Theater: 100% visible on any screen with ambient cyber glow.
+ * - Synced subtitles with golden phrase highlights.
  * - Safe-area anchored Bottom-Right "Skip Intro" button.
- * - Persistent Replay Button once dismissed.
  */
 (function () {
   if (window.__WORDRAIDERS_INTRO_INITIALIZED__) return;
@@ -14,6 +13,7 @@
   const isGhPages = window.location.pathname.startsWith('/wordraiders');
   const BASE_URL = isGhPages ? '/wordraiders/' : './';
   const VIDEO_URL = `${BASE_URL}code_video_assets/wordraiders_intro_cinematic.mp4`;
+  const AUDIO_URL = `${BASE_URL}code_video_assets/audio_voiceovers/intro_trailer_hardlight_heist.mp3`;
   const POSTER_URL = `${BASE_URL}code_video_assets/keyframes/wordraider_cyber_city_bg.jpg`;
 
   // Inject CSS Styles
@@ -99,6 +99,24 @@
       50% { opacity: 0.4; transform: scale(0.8); }
     }
 
+    /* Sound indicator toggle */
+    #wr-sound-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(6, 12, 24, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      border-radius: 20px;
+      color: #00E5FF;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+    }
+
     /* 16:9 Contained Theater Box: Guaranteed 100% Fit On Mobile */
     .wr-intro-stage-wrapper {
       position: relative;
@@ -122,9 +140,10 @@
       background: #02040a;
       box-shadow: 0 12px 45px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 229, 255, 0.25);
       border: 1.5px solid rgba(0, 229, 255, 0.35);
+      cursor: pointer;
     }
 
-    /* The Real Video Player */
+    /* Video Player */
     #wr-intro-video {
       position: absolute;
       inset: 0;
@@ -211,38 +230,34 @@
       font-size: 15px;
     }
 
-    /* Autoplay fallback start prompt */
-    #wr-intro-unmute-modal {
+    /* Tap for Sound banner (iOS Safari friendly) */
+    #wr-tap-sound-banner {
       position: absolute;
-      inset: 0;
-      z-index: 50;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 40;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      background: rgba(2, 5, 12, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    #wr-intro-unmute-modal.hidden {
-      display: none;
-    }
-    .wr-unmute-btn {
-      padding: 16px 32px;
-      background: linear-gradient(135deg, #00E5FF, #0077FE);
-      border: none;
-      border-radius: 36px;
-      color: #02050c;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: 1.5px;
+      gap: 10px;
+      padding: 14px 28px;
+      background: rgba(8, 14, 28, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid #00E5FF;
+      border-radius: 30px;
+      color: #00E5FF;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 1px;
       text-transform: uppercase;
       cursor: pointer;
-      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.5);
-      transition: transform 0.2s ease;
+      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.4);
+      transition: all 0.2s ease;
+      animation: wrPulse 1.4s infinite ease-in-out;
     }
-    .wr-unmute-btn:hover {
-      transform: scale(1.05);
+    #wr-tap-sound-banner.hidden {
+      display: none;
     }
 
     /* Replay Button attached to header once intro finishes */
@@ -297,20 +312,28 @@
           <div class="wr-intro-badge-dot"></div>
           <span>WordRaiders // Prologue</span>
         </div>
+        <button id="wr-sound-toggle-btn" aria-label="Toggle Sound">
+          <span id="wr-sound-icon">🔊</span>
+          <span id="wr-sound-label">Audio On</span>
+        </button>
       </div>
 
       <!-- Contained 16:9 Theater Stage -->
       <div class="wr-intro-stage-wrapper">
-        <div class="wr-intro-theater">
-          <!-- Native Video Element -->
+        <div class="wr-intro-theater" id="wr-intro-theater-box">
+          <!-- Video Element (playsinline + muted for iOS Safari instant autoplay) -->
           <video id="wr-intro-video"
                  src="${VIDEO_URL}"
                  poster="${POSTER_URL}"
                  playsinline
                  webkit-playsinline
+                 muted
                  autoplay
                  preload="auto">
           </video>
+          <div id="wr-tap-sound-banner">
+            <span>🔊 Tap for Audio</span>
+          </div>
         </div>
       </div>
 
@@ -324,29 +347,64 @@
           <span class="wr-skip-arrow">⏭</span>
         </button>
       </div>
-
-      <!-- Autoplay Fallback Modal (Mobile Safari Policy) -->
-      <div id="wr-intro-unmute-modal" class="hidden">
-        <button class="wr-unmute-btn" id="wr-intro-start-btn">⚔️ Start Expedition</button>
-      </div>
     `;
 
     document.body.appendChild(overlay);
 
     const video = document.getElementById('wr-intro-video');
+    const theaterBox = document.getElementById('wr-intro-theater-box');
     const captionEl = document.getElementById('wr-intro-caption-text');
     const skipBtn = document.getElementById('wr-intro-skip-btn');
-    const unmuteModal = document.getElementById('wr-intro-unmute-modal');
-    const startBtn = document.getElementById('wr-intro-start-btn');
+    const soundToggle = document.getElementById('wr-sound-toggle-btn');
+    const soundBanner = document.getElementById('wr-tap-sound-banner');
+
+    // Standalone Audio Element for rock-solid iOS Safari compatibility
+    const audio = new Audio(AUDIO_URL);
+    audio.preload = 'auto';
 
     let dismissed = false;
+    let audioStarted = false;
+
+    function enableSound() {
+      if (audioStarted) return;
+      audioStarted = true;
+      soundBanner.classList.add('hidden');
+      if (video) {
+        // Sync audio to video time
+        audio.currentTime = video.currentTime || 0;
+      }
+      audio.play().then(() => {
+        document.getElementById('wr-sound-icon').textContent = '🔊';
+        document.getElementById('wr-sound-label').textContent = 'Audio On';
+      }).catch(() => {
+        // Retry on next touch
+        audioStarted = false;
+      });
+    }
+
+    theaterBox.addEventListener('click', enableSound);
+    soundBanner.addEventListener('click', (e) => {
+      e.stopPropagation();
+      enableSound();
+    });
+
+    soundToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (audio.paused) {
+        audioStarted = false;
+        enableSound();
+      } else {
+        audio.pause();
+        document.getElementById('wr-sound-icon').textContent = '🔇';
+        document.getElementById('wr-sound-label').textContent = 'Audio Muted';
+      }
+    });
 
     function dismissIntro() {
       if (dismissed) return;
       dismissed = true;
-      if (video) {
-        video.pause();
-      }
+      if (video) video.pause();
+      audio.pause();
       overlay.classList.add('fade-out');
       setTimeout(() => {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -356,8 +414,9 @@
 
     skipBtn.addEventListener('click', dismissIntro);
 
-    video.addEventListener('timeupdate', () => {
-      const cur = video.currentTime;
+    // Sync subtitles and audio clock
+    function onTimeTick() {
+      const cur = audioStarted ? audio.currentTime : (video ? video.currentTime : 0);
       const cue = CAPTION_CUES.find(c => cur >= c.start && cur < c.end);
       if (cue && captionEl) {
         captionEl.textContent = cue.text;
@@ -367,26 +426,29 @@
           captionEl.classList.remove('highlight');
         }
       }
-    });
-
-    video.addEventListener('ended', dismissIntro);
-
-    // Attempt Autoplay with Sound
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // Autoplay policy prevented playback -> show interactive play button
-        unmuteModal.classList.remove('hidden');
-        startBtn.addEventListener('click', () => {
-          unmuteModal.classList.add('hidden');
-          video.play().catch(dismissIntro);
-        }, { once: true });
-      });
     }
 
-    // Safety timeout in case video stalls
+    if (video) {
+      video.addEventListener('timeupdate', onTimeTick);
+      video.addEventListener('ended', dismissIntro);
+      video.play().catch(() => {});
+    }
+
+    audio.addEventListener('timeupdate', onTimeTick);
+    audio.addEventListener('ended', dismissIntro);
+
+    // Try auto-starting audio immediately (works if user already interacted)
+    audio.play().then(() => {
+      audioStarted = true;
+      soundBanner.classList.add('hidden');
+    }).catch(() => {
+      // iOS Safari blocked background audio: keep "Tap for Audio" visible
+      soundBanner.classList.remove('hidden');
+    });
+
+    // Safety timeout
     setTimeout(() => {
-      if (!dismissed && video.paused && unmuteModal.classList.contains('hidden')) {
+      if (!dismissed && audio.paused && (!video || video.paused)) {
         dismissIntro();
       }
     }, 32000);
