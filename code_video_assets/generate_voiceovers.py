@@ -56,6 +56,12 @@ FEATURES = [
         "title": "WordRaiders Distributed CRDT Journey Consensus",
         "voice": "en-US-ChristopherNeural",
     },
+    {
+        "id": "intro_trailer_hardlight_heist",
+        "file": "intro_video_concept_3_hardlight_heist.md",
+        "title": "WordRaiders Conquer The Journey (Hard-Light Heist Trailer)",
+        "voice": "en-US-GuyNeural",
+    },
 ]
 
 
@@ -63,10 +69,13 @@ def extract_narration_script(markdown_path: Path) -> str:
     """Extract clean voiceover text from the narration script block in markdown."""
     text = markdown_path.read_text(encoding="utf-8")
     
-    # Locate the Narration Script section between ``` code fence
-    match = re.search(r"### 1\.2 Full Narration Script.*?```(?:\w+)?\n(.*?)```", text, re.DOTALL)
+    # Locate the Script section between ``` code fence
+    match = re.search(r"(?:### 1\.2 Full Narration Script|## 1\. Complete Trailer Script).*?```(?:\w+)?\n(.*?)```", text, re.DOTALL)
     if not match:
-        raise ValueError(f"Could not locate narration script section in {markdown_path.name}")
+        # Fallback: grab the first triple backtick code fence with VO
+        match = re.search(r"```(?:\w+)?\n(\[0:00.*?Voiceover.*?)```", text, re.DOTALL)
+        if not match:
+            raise ValueError(f"Could not locate narration script section in {markdown_path.name}")
     
     raw_script = match.group(1)
     
@@ -76,12 +85,12 @@ def extract_narration_script(markdown_path: Path) -> str:
     for line in raw_script.splitlines():
         line_str = line.strip()
         
-        # Skip visual cues and timestamp headers
-        if line_str.startswith("[Visual Cue:") or line_str.startswith("[0:") or line_str.startswith("[1:"):
+        # Skip visual cues, sound FX, and timestamp headers
+        if any(line_str.startswith(prefix) for prefix in ["[Visual Cue:", "[Visual:", "[Audio:", "[Sound FX:", "Audio:", "Visual:", "[0:", "[1:"]):
             in_vo = False
             continue
             
-        if line_str.startswith("Voiceover (VO):"):
+        if line_str.startswith("Voiceover (VO)") or line_str.startswith("VO:") or line_str.startswith("VO ("):
             in_vo = True
             continue
             
