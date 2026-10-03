@@ -408,7 +408,6 @@
       overlay.classList.add('fade-out');
       setTimeout(() => {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-        createReplayButton();
       }, 450);
     }
 
@@ -452,20 +451,6 @@
         dismissIntro();
       }
     }, 32000);
-  }
-
-  function createReplayButton() {
-    if (document.getElementById('wr-watch-intro-btn')) return;
-    const replayBtn = document.createElement('button');
-    replayBtn.id = 'wr-watch-intro-btn';
-    replayBtn.innerHTML = '▶ Watch Intro';
-    replayBtn.title = 'Watch the WordRaiders Cinematic Intro';
-    replayBtn.addEventListener('click', () => {
-      replayBtn.remove();
-      window.__WORDRAIDERS_INTRO_INITIALIZED__ = false;
-      createIntroElements();
-    });
-    document.body.appendChild(replayBtn);
   }
 
   if (document.readyState === 'loading') {
