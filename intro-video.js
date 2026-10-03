@@ -1,11 +1,11 @@
 /**
- * WordRaiders Cinematic Intro Video & Storyboard Overlay (v3 - Multi-layer Parallax Runner & Responsive 16:9)
- * - 16:9 Contained Theater: Fits 100% cleanly on any mobile or desktop screen without cropping.
- * - Dynamic Running Motion: Animated running gait bobbing, forward lean, twin chromatic after-image trails.
- * - Separate Parallax City: City tracks horizontally beneath the runner's stride.
- * - Hard-light footstep shockwaves, streaming speed lines, and trailing lexicon letter glyphs.
+ * WordRaiders Cinematic Intro Video (v4 - Native HD MP4 Video with Animated Runner)
+ * - Real 1080p/720p H.264 Video: The character visibly runs with dynamic limb strides, cape physics, and footstep shockwaves.
+ * - 16:9 Responsive Theater: Never crops on mobile screens; fits 100% cleanly on any device.
+ * - Ambient Cyber Backlight: Soft glow fills vertical space on portrait phones (Apple TV / Netflix mobile style).
+ * - Synchronized Subtitle Captions with narrative highlights.
  * - Safe-area anchored Bottom-Right "Skip Intro" button.
- * - Replay button accessible from game header.
+ * - Persistent Replay Button once dismissed.
  */
 (function () {
   if (window.__WORDRAIDERS_INTRO_INITIALIZED__) return;
@@ -13,9 +13,8 @@
 
   const isGhPages = window.location.pathname.startsWith('/wordraiders');
   const BASE_URL = isGhPages ? '/wordraiders/' : './';
-  const BG_URL = `${BASE_URL}code_video_assets/keyframes/wordraider_cyber_city_bg.jpg`;
-  const RUNNER_URL = `${BASE_URL}code_video_assets/keyframes/wordraider_running_ninja.jpg`;
-  const AUDIO_URL = `${BASE_URL}code_video_assets/audio_voiceovers/intro_trailer_hardlight_heist.mp3`;
+  const VIDEO_URL = `${BASE_URL}code_video_assets/wordraiders_intro_cinematic.mp4`;
+  const POSTER_URL = `${BASE_URL}code_video_assets/keyframes/wordraider_cyber_city_bg.jpg`;
 
   // Inject CSS Styles
   const style = document.createElement('style');
@@ -50,7 +49,7 @@
       inset: -10%;
       width: 120%;
       height: 120%;
-      background-image: url("${BG_URL}");
+      background-image: url("${POSTER_URL}");
       background-size: cover;
       background-position: center;
       filter: blur(50px) brightness(0.35) saturate(1.5);
@@ -115,7 +114,7 @@
     .wr-intro-theater {
       position: relative;
       width: 100%;
-      max-width: 940px;
+      max-width: 960px;
       aspect-ratio: 16 / 9;
       max-height: 60vh;
       border-radius: 16px;
@@ -125,172 +124,16 @@
       border: 1.5px solid rgba(0, 229, 255, 0.35);
     }
 
-    /* Layer 1: Background City with Smooth Parallax Camera Tracking */
-    .wr-theater-bg {
-      position: absolute;
-      inset: -5%;
-      width: 120%;
-      height: 110%;
-      background-image: url("${BG_URL}");
-      background-size: cover;
-      background-position: center bottom;
-      animation: wrCityTracking 16s ease-in-out infinite alternate;
-    }
-    @keyframes wrCityTracking {
-      0% {
-        transform: translateX(0%) scale(1.05);
-      }
-      50% {
-        transform: translateX(-4%) scale(1.08);
-      }
-      100% {
-        transform: translateX(-7%) scale(1.05);
-      }
-    }
-
-    /* Layer 2: Parallax Speed Lines */
-    .wr-speed-line {
-      position: absolute;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #00E5FF, #FF007F, transparent);
-      opacity: 0.8;
-      border-radius: 2px;
-      pointer-events: none;
-      animation: wrSpeedRush 0.75s linear infinite;
-    }
-    @keyframes wrSpeedRush {
-      0% { transform: translateX(110%); opacity: 0; }
-      20% { opacity: 0.9; }
-      80% { opacity: 0.9; }
-      100% { transform: translateX(-150%); opacity: 0; }
-    }
-
-    /* Layer 3: Hard-Light Footstep Shockwave Rings */
-    .wr-step-impact {
-      position: absolute;
-      width: 70px;
-      height: 28px;
-      border: 2px solid #00E5FF;
-      border-radius: 50%;
-      transform: scale(0.2);
-      opacity: 0;
-      pointer-events: none;
-      box-shadow: 0 0 20px #00E5FF, inset 0 0 12px #FF007F;
-    }
-    .wr-step-impact.step-left {
-      right: 30%;
-      bottom: 14%;
-      animation: wrStepBurst 0.65s infinite ease-out;
-    }
-    .wr-step-impact.step-right {
-      right: 22%;
-      bottom: 12%;
-      animation: wrStepBurst 0.65s 0.325s infinite ease-out;
-    }
-    @keyframes wrStepBurst {
-      0% { transform: scale(0.2); opacity: 1; border-color: #FF007F; }
-      40% { opacity: 0.9; border-color: #00E5FF; }
-      100% { transform: scale(2.8); opacity: 0; }
-    }
-
-    /* Layer 4: Running Character Motion Dynamics */
-    .wr-runner-container {
-      position: absolute;
-      right: 15%;
-      bottom: 6%;
-      width: 54%;
-      height: 85%;
-      pointer-events: none;
-      animation: wrRunGait 0.65s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-    }
-    @keyframes wrRunGait {
-      0% {
-        transform: translateY(0px) rotate(0deg);
-      }
-      25% {
-        transform: translateY(-16px) rotate(-2deg);
-      }
-      50% {
-        transform: translateY(4px) rotate(1.5deg);
-      }
-      75% {
-        transform: translateY(-18px) rotate(-2.5deg);
-      }
-      100% {
-        transform: translateY(0px) rotate(0deg);
-      }
-    }
-
-    /* Twin Chromatic After-Image Ghost Trails */
-    .wr-runner-ghost-cyan, .wr-runner-ghost-pink {
+    /* The Real Video Player */
+    #wr-intro-video {
       position: absolute;
       inset: 0;
-      background-image: url("${RUNNER_URL}");
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center bottom;
-      mix-blend-mode: screen;
-      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #000;
     }
-    .wr-runner-ghost-cyan {
-      transform: translate(-12px, 3px);
-      filter: drop-shadow(0 0 14px #00E5FF);
-      opacity: 0.55;
-      animation: wrGhostPulse 0.65s infinite alternate;
-    }
-    .wr-runner-ghost-pink {
-      transform: translate(-22px, 6px);
-      filter: drop-shadow(0 0 16px #FF007F);
-      opacity: 0.45;
-      animation: wrGhostPulse 0.65s infinite alternate-reverse;
-    }
-    @keyframes wrGhostPulse {
-      0% { opacity: 0.25; transform: translate(-8px, 2px); }
-      100% { opacity: 0.7; transform: translate(-20px, 6px); }
-    }
-
-    /* Primary Ninja Runner Body (Pitch Black Disappears in Screen Mode) */
-    .wr-runner-body {
-      position: absolute;
-      inset: 0;
-      background-image: url("${RUNNER_URL}");
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center bottom;
-      mix-blend-mode: screen;
-      filter: contrast(1.15) brightness(1.1);
-    }
-
-    /* Layer 5: Flying Lexicon Code Letters */
-    .wr-flying-letter {
-      position: absolute;
-      font-size: 16px;
-      font-weight: 900;
-      color: #00E5FF;
-      text-shadow: 0 0 12px #00E5FF;
-      opacity: 0;
-      pointer-events: none;
-      animation: wrLetterFly 1.6s linear infinite;
-    }
-    @keyframes wrLetterFly {
-      0% { transform: translate(120%, 0) scale(0.5); opacity: 0; }
-      25% { opacity: 0.9; }
-      75% { opacity: 0.75; }
-      100% { transform: translate(-380%, 40px) scale(1.3); opacity: 0; }
-    }
-
-    /* Letterbox Cinematic Bars */
-    .wr-theater-bar-top, .wr-theater-bar-bottom {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 5%;
-      background: #020409;
-      z-index: 10;
-      pointer-events: none;
-    }
-    .wr-theater-bar-top { top: 0; border-bottom: 1px solid rgba(0, 229, 255, 0.2); }
-    .wr-theater-bar-bottom { bottom: 0; border-top: 1px solid rgba(0, 229, 255, 0.2); }
 
     /* Bottom Control Bar: Subtitles + Skip Button */
     .wr-intro-bottom-bar {
@@ -459,34 +302,15 @@
       <!-- Contained 16:9 Theater Stage -->
       <div class="wr-intro-stage-wrapper">
         <div class="wr-intro-theater">
-          <div class="wr-theater-bar-top"></div>
-
-          <!-- Parallax City Backdrop -->
-          <div class="wr-theater-bg"></div>
-
-          <!-- Speed Lasers -->
-          <div class="wr-speed-line" style="top: 25%; width: 140px; animation-duration: 0.6s; animation-delay: 0s;"></div>
-          <div class="wr-speed-line" style="top: 50%; width: 200px; animation-duration: 0.75s; animation-delay: 0.25s;"></div>
-          <div class="wr-speed-line" style="top: 72%; width: 160px; animation-duration: 0.55s; animation-delay: 0.4s;"></div>
-
-          <!-- Hard-Light Footstep Shockwaves Under Boots -->
-          <div class="wr-step-impact step-left"></div>
-          <div class="wr-step-impact step-right"></div>
-
-          <!-- Trailing Hard-Light Letter Glyphs -->
-          <div class="wr-flying-letter" style="top: 35%; right: 12%; animation-delay: 0s;">W</div>
-          <div class="wr-flying-letter" style="top: 58%; right: 16%; animation-delay: 0.35s; color: #FF007F; text-shadow: 0 0 12px #FF007F;">R</div>
-          <div class="wr-flying-letter" style="top: 22%; right: 24%; animation-delay: 0.8s; color: #FFD700; text-shadow: 0 0 12px #FFD700;">D</div>
-          <div class="wr-flying-letter" style="top: 48%; right: 8%; animation-delay: 1.2s;">S</div>
-
-          <!-- Dynamic Ninja Runner with Chromatic Ghost Trails -->
-          <div class="wr-runner-container">
-            <div class="wr-runner-ghost-pink"></div>
-            <div class="wr-runner-ghost-cyan"></div>
-            <div class="wr-runner-body"></div>
-          </div>
-
-          <div class="wr-theater-bar-bottom"></div>
+          <!-- Native Video Element -->
+          <video id="wr-intro-video"
+                 src="${VIDEO_URL}"
+                 poster="${POSTER_URL}"
+                 playsinline
+                 webkit-playsinline
+                 autoplay
+                 preload="auto">
+          </video>
         </div>
       </div>
 
@@ -501,17 +325,15 @@
         </button>
       </div>
 
-      <!-- Autoplay Fallback Modal -->
+      <!-- Autoplay Fallback Modal (Mobile Safari Policy) -->
       <div id="wr-intro-unmute-modal" class="hidden">
         <button class="wr-unmute-btn" id="wr-intro-start-btn">⚔️ Start Expedition</button>
       </div>
     `;
 
-    const audio = new Audio(AUDIO_URL);
-    audio.preload = 'auto';
-
     document.body.appendChild(overlay);
 
+    const video = document.getElementById('wr-intro-video');
     const captionEl = document.getElementById('wr-intro-caption-text');
     const skipBtn = document.getElementById('wr-intro-skip-btn');
     const unmuteModal = document.getElementById('wr-intro-unmute-modal');
@@ -522,7 +344,9 @@
     function dismissIntro() {
       if (dismissed) return;
       dismissed = true;
-      audio.pause();
+      if (video) {
+        video.pause();
+      }
       overlay.classList.add('fade-out');
       setTimeout(() => {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -532,8 +356,8 @@
 
     skipBtn.addEventListener('click', dismissIntro);
 
-    audio.addEventListener('timeupdate', () => {
-      const cur = audio.currentTime;
+    video.addEventListener('timeupdate', () => {
+      const cur = video.currentTime;
       const cue = CAPTION_CUES.find(c => cur >= c.start && cur < c.end);
       if (cue && captionEl) {
         captionEl.textContent = cue.text;
@@ -545,23 +369,24 @@
       }
     });
 
-    audio.addEventListener('ended', dismissIntro);
+    video.addEventListener('ended', dismissIntro);
 
-    // Attempt Autoplay with Audio
-    const playPromise = audio.play();
+    // Attempt Autoplay with Sound
+    const playPromise = video.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
+        // Autoplay policy prevented playback -> show interactive play button
         unmuteModal.classList.remove('hidden');
         startBtn.addEventListener('click', () => {
           unmuteModal.classList.add('hidden');
-          audio.play().catch(dismissIntro);
+          video.play().catch(dismissIntro);
         }, { once: true });
       });
     }
 
-    // Safety timeout in case audio stalls
+    // Safety timeout in case video stalls
     setTimeout(() => {
-      if (!dismissed && audio.paused && unmuteModal.classList.contains('hidden')) {
+      if (!dismissed && video.paused && unmuteModal.classList.contains('hidden')) {
         dismissIntro();
       }
     }, 32000);
