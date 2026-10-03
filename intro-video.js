@@ -1,17 +1,20 @@
 /**
- * WordRaiders Cinematic Intro Video & Storyboard Overlay
- * Plays the "Conquer the Journey" Hard-Light Heist trailer on app launch.
- * Includes a prominent "Skip Intro" button in the bottom-right corner.
+ * WordRaiders Cinematic Intro Video & Storyboard Overlay (v3 - Multi-layer Parallax Runner & Responsive 16:9)
+ * - 16:9 Contained Theater: Fits 100% cleanly on any mobile or desktop screen without cropping.
+ * - Dynamic Running Motion: Animated running gait bobbing, forward lean, twin chromatic after-image trails.
+ * - Separate Parallax City: City tracks horizontally beneath the runner's stride.
+ * - Hard-light footstep shockwaves, streaming speed lines, and trailing lexicon letter glyphs.
+ * - Safe-area anchored Bottom-Right "Skip Intro" button.
+ * - Replay button accessible from game header.
  */
 (function () {
-  // Prevent duplicate initialization
   if (window.__WORDRAIDERS_INTRO_INITIALIZED__) return;
   window.__WORDRAIDERS_INTRO_INITIALIZED__ = true;
 
-  // Resolve base URL for GitHub Pages (/wordraiders/) or root (/)
   const isGhPages = window.location.pathname.startsWith('/wordraiders');
   const BASE_URL = isGhPages ? '/wordraiders/' : './';
-  const IMAGE_URL = `${BASE_URL}code_video_assets/keyframes/keyframe_intro_hardlight_heist.jpg`;
+  const BG_URL = `${BASE_URL}code_video_assets/keyframes/wordraider_cyber_city_bg.jpg`;
+  const RUNNER_URL = `${BASE_URL}code_video_assets/keyframes/wordraider_running_ninja.jpg`;
   const AUDIO_URL = `${BASE_URL}code_video_assets/audio_voiceovers/intro_trailer_hardlight_heist.mp3`;
 
   // Inject CSS Styles
@@ -22,227 +25,411 @@
       position: fixed;
       inset: 0;
       z-index: 999999;
-      background: #060913;
+      background: #02050c;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
       user-select: none;
-      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s ease;
+      -webkit-user-select: none;
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s ease;
+      padding-top: max(env(safe-area-inset-top, 16px), 14px);
+      padding-bottom: max(env(safe-area-inset-bottom, 20px), 16px);
+      box-sizing: border-box;
     }
     #wr-intro-overlay.fade-out {
       opacity: 0;
       pointer-events: none;
-      transform: scale(1.04);
+      transform: scale(1.02);
     }
-    .wr-intro-bg {
+
+    /* Ambient background glow filling tall mobile screens */
+    .wr-intro-ambient-bg {
       position: absolute;
-      inset: -5%;
-      width: 110%;
-      height: 110%;
-      background-image: url("${IMAGE_URL}");
+      inset: -10%;
+      width: 120%;
+      height: 120%;
+      background-image: url("${BG_URL}");
       background-size: cover;
-      background-position: center 35%;
-      filter: brightness(0.9) contrast(1.15);
-      animation: wrKenBurns 28s ease-out forwards;
-      will-change: transform;
-    }
-    @keyframes wrKenBurns {
-      0% { transform: scale(1) translate(0, 0); }
-      50% { transform: scale(1.12) translate(-2%, -1%); }
-      100% { transform: scale(1.22) translate(1%, -2%); }
-    }
-    .wr-intro-vignette {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, transparent 40%, rgba(6, 9, 19, 0.75) 85%, #060913 100%),
-                  linear-gradient(to bottom, rgba(6,9,19,0.7) 0%, transparent 20%, transparent 75%, rgba(6,9,19,0.9) 100%);
+      background-position: center;
+      filter: blur(50px) brightness(0.35) saturate(1.5);
+      transform: scale(1.1);
       pointer-events: none;
+      opacity: 0.9;
     }
-    /* Letterbox cinematic widescreen bars */
-    .wr-intro-bar-top, .wr-intro-bar-bottom {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 7vh;
-      background: #04060c;
-      z-index: 10;
-      box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
-    }
-    .wr-intro-bar-top { top: 0; border-bottom: 1px solid rgba(0, 229, 255, 0.2); }
-    .wr-intro-bar-bottom { bottom: 0; border-top: 1px solid rgba(0, 229, 255, 0.2); }
-    
-    .wr-intro-hud-badge {
-      position: absolute;
-      top: calc(7vh + 16px);
-      left: 24px;
-      z-index: 20;
+
+    /* Top HUD Navigation Bar */
+    .wr-intro-top-bar {
+      position: relative;
+      z-index: 30;
       display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 18px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .wr-intro-hud-badge {
+      display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 6px 14px;
-      background: rgba(8, 14, 28, 0.75);
-      backdrop-filter: blur(10px);
+      background: rgba(6, 12, 24, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(0, 229, 255, 0.4);
       border-radius: 20px;
       color: #00E5FF;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
     }
     .wr-intro-badge-dot {
-      width: 7px;
-      height: 7px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: #FF007F;
       box-shadow: 0 0 8px #FF007F;
-      animation: wrBlink 1.2s infinite;
+      animation: wrPulse 1.2s infinite ease-in-out;
     }
-    @keyframes wrBlink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+    @keyframes wrPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
     }
-    
-    /* Subtitle & Kinetic Caption Box */
-    .wr-intro-caption-container {
-      position: absolute;
-      bottom: calc(7vh + 32px);
-      left: 5%;
-      right: 200px;
+
+    /* 16:9 Contained Theater Box: Guaranteed 100% Fit On Mobile */
+    .wr-intro-stage-wrapper {
+      position: relative;
       z-index: 20;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0 14px;
+      box-sizing: border-box;
+    }
+    .wr-intro-theater {
+      position: relative;
+      width: 100%;
+      max-width: 940px;
+      aspect-ratio: 16 / 9;
+      max-height: 60vh;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #02040a;
+      box-shadow: 0 12px 45px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 229, 255, 0.25);
+      border: 1.5px solid rgba(0, 229, 255, 0.35);
+    }
+
+    /* Layer 1: Background City with Smooth Parallax Camera Tracking */
+    .wr-theater-bg {
+      position: absolute;
+      inset: -5%;
+      width: 120%;
+      height: 110%;
+      background-image: url("${BG_URL}");
+      background-size: cover;
+      background-position: center bottom;
+      animation: wrCityTracking 16s ease-in-out infinite alternate;
+    }
+    @keyframes wrCityTracking {
+      0% {
+        transform: translateX(0%) scale(1.05);
+      }
+      50% {
+        transform: translateX(-4%) scale(1.08);
+      }
+      100% {
+        transform: translateX(-7%) scale(1.05);
+      }
+    }
+
+    /* Layer 2: Parallax Speed Lines */
+    .wr-speed-line {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #00E5FF, #FF007F, transparent);
+      opacity: 0.8;
+      border-radius: 2px;
       pointer-events: none;
+      animation: wrSpeedRush 0.75s linear infinite;
+    }
+    @keyframes wrSpeedRush {
+      0% { transform: translateX(110%); opacity: 0; }
+      20% { opacity: 0.9; }
+      80% { opacity: 0.9; }
+      100% { transform: translateX(-150%); opacity: 0; }
+    }
+
+    /* Layer 3: Hard-Light Footstep Shockwave Rings */
+    .wr-step-impact {
+      position: absolute;
+      width: 70px;
+      height: 28px;
+      border: 2px solid #00E5FF;
+      border-radius: 50%;
+      transform: scale(0.2);
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 0 20px #00E5FF, inset 0 0 12px #FF007F;
+    }
+    .wr-step-impact.step-left {
+      right: 30%;
+      bottom: 14%;
+      animation: wrStepBurst 0.65s infinite ease-out;
+    }
+    .wr-step-impact.step-right {
+      right: 22%;
+      bottom: 12%;
+      animation: wrStepBurst 0.65s 0.325s infinite ease-out;
+    }
+    @keyframes wrStepBurst {
+      0% { transform: scale(0.2); opacity: 1; border-color: #FF007F; }
+      40% { opacity: 0.9; border-color: #00E5FF; }
+      100% { transform: scale(2.8); opacity: 0; }
+    }
+
+    /* Layer 4: Running Character Motion Dynamics */
+    .wr-runner-container {
+      position: absolute;
+      right: 15%;
+      bottom: 6%;
+      width: 54%;
+      height: 85%;
+      pointer-events: none;
+      animation: wrRunGait 0.65s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+    }
+    @keyframes wrRunGait {
+      0% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      25% {
+        transform: translateY(-16px) rotate(-2deg);
+      }
+      50% {
+        transform: translateY(4px) rotate(1.5deg);
+      }
+      75% {
+        transform: translateY(-18px) rotate(-2.5deg);
+      }
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+    }
+
+    /* Twin Chromatic After-Image Ghost Trails */
+    .wr-runner-ghost-cyan, .wr-runner-ghost-pink {
+      position: absolute;
+      inset: 0;
+      background-image: url("${RUNNER_URL}");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center bottom;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .wr-runner-ghost-cyan {
+      transform: translate(-12px, 3px);
+      filter: drop-shadow(0 0 14px #00E5FF);
+      opacity: 0.55;
+      animation: wrGhostPulse 0.65s infinite alternate;
+    }
+    .wr-runner-ghost-pink {
+      transform: translate(-22px, 6px);
+      filter: drop-shadow(0 0 16px #FF007F);
+      opacity: 0.45;
+      animation: wrGhostPulse 0.65s infinite alternate-reverse;
+    }
+    @keyframes wrGhostPulse {
+      0% { opacity: 0.25; transform: translate(-8px, 2px); }
+      100% { opacity: 0.7; transform: translate(-20px, 6px); }
+    }
+
+    /* Primary Ninja Runner Body (Pitch Black Disappears in Screen Mode) */
+    .wr-runner-body {
+      position: absolute;
+      inset: 0;
+      background-image: url("${RUNNER_URL}");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center bottom;
+      mix-blend-mode: screen;
+      filter: contrast(1.15) brightness(1.1);
+    }
+
+    /* Layer 5: Flying Lexicon Code Letters */
+    .wr-flying-letter {
+      position: absolute;
+      font-size: 16px;
+      font-weight: 900;
+      color: #00E5FF;
+      text-shadow: 0 0 12px #00E5FF;
+      opacity: 0;
+      pointer-events: none;
+      animation: wrLetterFly 1.6s linear infinite;
+    }
+    @keyframes wrLetterFly {
+      0% { transform: translate(120%, 0) scale(0.5); opacity: 0; }
+      25% { opacity: 0.9; }
+      75% { opacity: 0.75; }
+      100% { transform: translate(-380%, 40px) scale(1.3); opacity: 0; }
+    }
+
+    /* Letterbox Cinematic Bars */
+    .wr-theater-bar-top, .wr-theater-bar-bottom {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 5%;
+      background: #020409;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .wr-theater-bar-top { top: 0; border-bottom: 1px solid rgba(0, 229, 255, 0.2); }
+    .wr-theater-bar-bottom { bottom: 0; border-top: 1px solid rgba(0, 229, 255, 0.2); }
+
+    /* Bottom Control Bar: Subtitles + Skip Button */
+    .wr-intro-bottom-bar {
+      position: relative;
+      z-index: 30;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 8px 18px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Subtitle Caption Box */
+    .wr-intro-caption-box {
+      flex: 1;
+      max-width: 620px;
     }
     .wr-intro-caption {
       display: inline-block;
-      padding: 10px 18px;
-      background: rgba(6, 10, 22, 0.85);
-      backdrop-filter: blur(12px);
+      padding: 8px 14px;
+      background: rgba(6, 12, 24, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-left: 4px solid #00E5FF;
       border-radius: 4px;
       color: #FFFFFF;
-      font-size: clamp(16px, 2.8vw, 26px);
+      font-size: clamp(13px, 3.4vw, 20px);
       font-weight: 800;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-      transform: translateY(0);
-      opacity: 1;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      transition: border-color 0.2s, color 0.2s, text-shadow 0.2s;
     }
     .wr-intro-caption.highlight {
       border-left-color: #FF007F;
       color: #FFD700;
-      text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+      text-shadow: 0 0 16px rgba(255, 215, 0, 0.55);
     }
 
-    /* Bottom-Right Skip Button */
+    /* Skip Intro Button (Bottom Right) */
     #wr-intro-skip-btn {
-      position: absolute;
-      bottom: calc(7vh + 24px);
-      right: 24px;
-      z-index: 30;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 12px 22px;
-      background: rgba(12, 20, 37, 0.85);
+      gap: 8px;
+      padding: 10px 18px;
+      background: rgba(10, 18, 36, 0.92);
       backdrop-filter: blur(16px);
-      border: 1.5px solid rgba(0, 229, 255, 0.5);
-      border-radius: 30px;
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(0, 229, 255, 0.65);
+      border-radius: 28px;
       color: #FFFFFF;
       font-size: 14px;
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 0.6px;
       cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 229, 255, 0.2);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 16px rgba(0, 229, 255, 0.25);
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      -webkit-tap-highlight-color: transparent;
     }
-    #wr-intro-skip-btn:hover, #wr-intro-skip-btn:focus-visible {
-      background: rgba(0, 229, 255, 0.2);
+    #wr-intro-skip-btn:hover {
+      background: rgba(0, 229, 255, 0.25);
       border-color: #00E5FF;
-      transform: translateY(-2px) scale(1.03);
-      box-shadow: 0 8px 25px rgba(0, 229, 255, 0.4);
-      outline: none;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 229, 255, 0.45);
     }
     #wr-intro-skip-btn:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
     }
     .wr-skip-arrow {
       color: #00E5FF;
-      font-size: 16px;
-      transition: transform 0.2s ease;
-    }
-    #wr-intro-skip-btn:hover .wr-skip-arrow {
-      transform: translateX(3px);
+      font-size: 15px;
     }
 
-    /* Start / Unmute Overlay if browser blocks autoplay */
+    /* Autoplay fallback start prompt */
     #wr-intro-unmute-modal {
       position: absolute;
       inset: 0;
-      z-index: 40;
+      z-index: 50;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(6, 9, 19, 0.65);
-      backdrop-filter: blur(8px);
-      transition: opacity 0.3s ease;
+      background: rgba(2, 5, 12, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
     #wr-intro-unmute-modal.hidden {
       display: none;
     }
     .wr-unmute-btn {
-      padding: 18px 36px;
+      padding: 16px 32px;
       background: linear-gradient(135deg, #00E5FF, #0077FE);
       border: none;
-      border-radius: 40px;
-      color: #050B17;
-      font-size: 18px;
+      border-radius: 36px;
+      color: #02050c;
+      font-size: 16px;
       font-weight: 900;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       cursor: pointer;
-      box-shadow: 0 10px 35px rgba(0, 229, 255, 0.5);
-      transition: all 0.2s ease;
+      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.5);
+      transition: transform 0.2s ease;
     }
     .wr-unmute-btn:hover {
       transform: scale(1.05);
-      box-shadow: 0 14px 45px rgba(0, 229, 255, 0.7);
-    }
-    .wr-unmute-subtitle {
-      margin-top: 14px;
-      color: rgba(255, 255, 255, 0.75);
-      font-size: 13px;
-      letter-spacing: 0.5px;
     }
 
-    /* Replay Button in corner of finished game */
+    /* Replay Button attached to header once intro finishes */
     #wr-watch-intro-btn {
       position: fixed;
-      top: 14px;
+      top: calc(env(safe-area-inset-top, 12px) + 8px);
       right: 14px;
       z-index: 9999;
-      padding: 6px 12px;
-      background: rgba(12, 20, 37, 0.85);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(0, 229, 255, 0.35);
+      padding: 6px 14px;
+      background: rgba(10, 18, 36, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 229, 255, 0.45);
       border-radius: 18px;
       color: #00E5FF;
       font-size: 11px;
       font-weight: 700;
       cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
       transition: all 0.2s ease;
     }
     #wr-watch-intro-btn:hover {
-      background: rgba(0, 229, 255, 0.2);
+      background: rgba(0, 229, 255, 0.25);
       border-color: #00E5FF;
+      transform: translateY(-1px);
     }
   `;
   document.head.appendChild(style);
 
-  // Subtitle Cues synchronized with audio playback
+  // Synchronized Voiceover Captions (Option 3: Mythic Quest Narrator)
   const CAPTION_CUES = [
     { start: 0.0, end: 3.8, text: "What if words weren't just letters?", highlight: false },
     { start: 3.8, end: 8.0, text: "What if every word was a cheat code to reality?", highlight: true },
@@ -250,7 +437,7 @@
     { start: 11.8, end: 15.2, text: "WELCOME TO WORDRAIDERS.", highlight: true },
     { start: 15.2, end: 19.5, text: "Nine brutal chapters. Fifty-six spelling realms.", highlight: false },
     { start: 19.5, end: 23.0, text: "Colossal bosses standing between you and mastery.", highlight: true },
-    { start: 23.0, end: 27.0, text: "THE RAID BEGINS NOW. CONQUER THE JOURNEY.", highlight: true },
+    { start: 23.0, end: 27.5, text: "THE RAID BEGINS NOW. CONQUER THE JOURNEY.", highlight: true },
   ];
 
   function createIntroElements() {
@@ -258,32 +445,68 @@
     overlay.id = 'wr-intro-overlay';
 
     overlay.innerHTML = `
-      <div class="wr-intro-bar-top"></div>
-      <div class="wr-intro-bg"></div>
-      <div class="wr-intro-vignette"></div>
-      <div class="wr-intro-bar-bottom"></div>
+      <!-- Ambient Background Glow -->
+      <div class="wr-intro-ambient-bg"></div>
 
-      <div class="wr-intro-hud-badge">
-        <div class="wr-intro-badge-dot"></div>
-        <span>WordRaiders // Prologue</span>
+      <!-- Top HUD Header -->
+      <div class="wr-intro-top-bar">
+        <div class="wr-intro-hud-badge">
+          <div class="wr-intro-badge-dot"></div>
+          <span>WordRaiders // Prologue</span>
+        </div>
       </div>
 
-      <div class="wr-intro-caption-container">
-        <div class="wr-intro-caption" id="wr-intro-caption-text">CONQUER THE JOURNEY</div>
+      <!-- Contained 16:9 Theater Stage -->
+      <div class="wr-intro-stage-wrapper">
+        <div class="wr-intro-theater">
+          <div class="wr-theater-bar-top"></div>
+
+          <!-- Parallax City Backdrop -->
+          <div class="wr-theater-bg"></div>
+
+          <!-- Speed Lasers -->
+          <div class="wr-speed-line" style="top: 25%; width: 140px; animation-duration: 0.6s; animation-delay: 0s;"></div>
+          <div class="wr-speed-line" style="top: 50%; width: 200px; animation-duration: 0.75s; animation-delay: 0.25s;"></div>
+          <div class="wr-speed-line" style="top: 72%; width: 160px; animation-duration: 0.55s; animation-delay: 0.4s;"></div>
+
+          <!-- Hard-Light Footstep Shockwaves Under Boots -->
+          <div class="wr-step-impact step-left"></div>
+          <div class="wr-step-impact step-right"></div>
+
+          <!-- Trailing Hard-Light Letter Glyphs -->
+          <div class="wr-flying-letter" style="top: 35%; right: 12%; animation-delay: 0s;">W</div>
+          <div class="wr-flying-letter" style="top: 58%; right: 16%; animation-delay: 0.35s; color: #FF007F; text-shadow: 0 0 12px #FF007F;">R</div>
+          <div class="wr-flying-letter" style="top: 22%; right: 24%; animation-delay: 0.8s; color: #FFD700; text-shadow: 0 0 12px #FFD700;">D</div>
+          <div class="wr-flying-letter" style="top: 48%; right: 8%; animation-delay: 1.2s;">S</div>
+
+          <!-- Dynamic Ninja Runner with Chromatic Ghost Trails -->
+          <div class="wr-runner-container">
+            <div class="wr-runner-ghost-pink"></div>
+            <div class="wr-runner-ghost-cyan"></div>
+            <div class="wr-runner-body"></div>
+          </div>
+
+          <div class="wr-theater-bar-bottom"></div>
+        </div>
       </div>
 
-      <button id="wr-intro-skip-btn" aria-label="Skip Intro Video">
-        <span>Skip Intro</span>
-        <span class="wr-skip-arrow">⏭</span>
-      </button>
+      <!-- Bottom HUD & Subtitle Controls -->
+      <div class="wr-intro-bottom-bar">
+        <div class="wr-intro-caption-box">
+          <div class="wr-intro-caption" id="wr-intro-caption-text">CONQUER THE JOURNEY</div>
+        </div>
+        <button id="wr-intro-skip-btn" aria-label="Skip Intro Video">
+          <span>Skip Intro</span>
+          <span class="wr-skip-arrow">⏭</span>
+        </button>
+      </div>
 
+      <!-- Autoplay Fallback Modal -->
       <div id="wr-intro-unmute-modal" class="hidden">
         <button class="wr-unmute-btn" id="wr-intro-start-btn">⚔️ Start Expedition</button>
-        <div class="wr-unmute-subtitle">Tap to enable audio & begin the journey</div>
       </div>
     `;
 
-    // Create Audio Element
     const audio = new Audio(AUDIO_URL);
     audio.preload = 'auto';
 
@@ -304,12 +527,11 @@
       setTimeout(() => {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
         createReplayButton();
-      }, 600);
+      }, 450);
     }
 
     skipBtn.addEventListener('click', dismissIntro);
 
-    // Audio timeupdate to sync subtitles
     audio.addEventListener('timeupdate', () => {
       const cur = audio.currentTime;
       const cue = CAPTION_CUES.find(c => cur >= c.start && cur < c.end);
@@ -325,11 +547,10 @@
 
     audio.addEventListener('ended', dismissIntro);
 
-    // Attempt Autoplay
+    // Attempt Autoplay with Audio
     const playPromise = audio.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
-        // Autoplay with sound was blocked by browser policy -> show tap to play button
         unmuteModal.classList.remove('hidden');
         startBtn.addEventListener('click', () => {
           unmuteModal.classList.add('hidden');
@@ -338,7 +559,7 @@
       });
     }
 
-    // Auto-dismiss safety timeout if audio fails to trigger ended
+    // Safety timeout in case audio stalls
     setTimeout(() => {
       if (!dismissed && audio.paused && unmuteModal.classList.contains('hidden')) {
         dismissIntro();
@@ -360,7 +581,6 @@
     document.body.appendChild(replayBtn);
   }
 
-  // Initialize once DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', createIntroElements);
   } else {
