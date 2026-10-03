@@ -79,3 +79,4 @@ export function mastery(p,u){const a=state(p),r=meaningState(p,USES[u].id),good=
  const gates=[objects.size===50,patterns.size===5,types.size===5,days.size>=3,transfers>=2,!!check?.pass&&check.score===20&&recent];
  return {objects:objects.size,patterns:patterns.size,types:types.size,days:days.size,transfers,ready:gates.slice(0,5).every(Boolean),mastered:gates.every(Boolean),percent:Math.floor(gates.filter(Boolean).length/6*100),check};
 }
+
