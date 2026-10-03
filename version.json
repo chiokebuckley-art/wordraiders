@@ -1,1 +1,12 @@
-{"version":"94ec26c","builtAt":"2026-10-02T03:28:30Z"}
+{
+  "version": "0.2.0-picture-dictionary.3084.2",
+  "sourceBase": "94ec26c9bc27e60642ee95035a28b1c85c499b82",
+  "expansionReady": 3084,
+  "expansionPlanned": 3084,
+  "publicationStatus": "release_ready",
+  "unresolved": [],
+  "originalExpansionPlanned": 3085,
+  "approvedOmissions": [
+    "tickle|verb"
+  ]
+}
