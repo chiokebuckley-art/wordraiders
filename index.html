@@ -16,6 +16,7 @@
     <script type="module" crossorigin src="/wordraiders/assets/index-BNXmkoQO.js"></script>
     <link rel="stylesheet" crossorigin href="/wordraiders/assets/index-BEN7vTOd.css">
     <style id="wr-home-trim">/* Home shows Continue and Today; the Journey panel stays only to start a new player's Journey. */.sl-journey:not(:has(.jr-start)){display:none}</style>
+    <style id="wr-next-action">/* Next action first (Word Quest chapter): the next power is the big row; finished powers are small Replay rows; locked rows, the locked boss and the drills stay out of the way until they are the next step. */.sl-page:has(.sl-boss) .sl-row.locked{display:none}.sl-boss.locked{display:none}.sl-page:has(.sl-row.current) .sl-shortcuts{display:none}.sl-page:has(.sl-boss) .sl-row:not(.current):not(.locked){padding-block:6px;min-height:0;opacity:.8}.sl-page:has(.sl-boss) .sl-row:not(.current):not(.locked) small{display:none}.sl-page:has(.sl-boss) .sl-row.current{padding-block:22px;font-size:1.15em;box-shadow:0 0 0 3px var(--wr-lime,#bfff73),0 10px 28px #0006}.sl-page:has(.sl-boss) .sl-row.current .sl-row-right{font-size:1.2em}</style>
   </head>
   <body class="antialiased">
     <div id="root"></div>
