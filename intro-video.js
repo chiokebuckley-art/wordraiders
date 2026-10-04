@@ -10,6 +10,13 @@
   if (window.__WORDRAIDERS_INTRO_INITIALIZED__) return;
   window.__WORDRAIDERS_INTRO_INITIALIZED__ = true;
 
+  // Coming back from an academy (their back links open ../?journey) or opening Home again in the same browser tab goes
+  // straight to the Home screen: the intro plays once per visit.
+  try {
+    if (/[?&]journey\b/.test(window.location.search) || sessionStorage.getItem('wr-intro-seen')) return;
+    sessionStorage.setItem('wr-intro-seen', '1');
+  } catch (e) { /* storage blocked: play as before */ }
+
   const isGhPages = window.location.pathname.startsWith('/wordraiders');
   const BASE_URL = isGhPages ? '/wordraiders/' : './';
   const VIDEO_URL = `${BASE_URL}code_video_assets/wordraiders_intro_cinematic.mp4`;
