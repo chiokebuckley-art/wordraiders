@@ -7,7 +7,8 @@ https://chiokebuckley-art.github.io/wordraiders/storyforge/
 - 24 missions across six acts: explanation, original worked example, two practice questions, and a writing assignment with self-review.
 - 48 distinct concept questions used in learning and shuffled arcade rounds; seen questions are deprioritized across rounds, not claimed to be infinite.
 - Four arcade modes, including four causal sequencing stories, plus all five handbook writing drills with optional timers.
-- Multiple local writer profiles and film projects; editable blueprint; reorderable screenplay scene cards; draft snapshots; evidence-based final project review.
+- A Who’s writing? chooser at the quest entrance, always-visible Create / Switch profile controls, separate writer progress and films, rename-without-loss, and individual profile exports. Profile changes stop on storage failure. Profiles are browser-local, not cloud accounts.
+- Multiple film projects; editable blueprint; reorderable screenplay scene cards; draft snapshots; evidence-based final project review.
 - Full JSON backup/import (imports add profiles), Markdown workbook and Fountain screenplay export, and a printable reading preview.
 - Original complete worked example, glossary, sources, and mobile layout.
 
