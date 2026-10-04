@@ -1,5 +1,5 @@
 import {LESSONS} from './content.js?v=belt-2';
-import {accepts,firstWrong,hintFor,shuffled,trayOrder,roundItems} from './engine.js?v=belt-1';
+import {accepts,firstWrong,hintFor,shuffled,trayOrder,roundItems} from './engine.js?v=belt-2';
 
 // Sentence Belt (inside WordRaiders): put a paragraph's sentences in order on the belt, run the line, then show what
 // the paragraph means. A paragraph passes only when the order is accepted AND the meaning answer is right the first
