@@ -1,0 +1,77 @@
+/* Sentence Belt: tray → belt → Run the line → meaning check. WordRaiders colours; motion is short and can be reduced. */
+:root{--bg:#0b1b2b;--card:#132a40;--card2:#1a3654;--line:#2b4966;--ink:#f4f7fb;--muted:#b8c7da;--lime:#bfff73;--violet:#b388ff;--sky:#4cc9f0;--gold:#ffc857;--rose:#ff7c9c;--mint:#7cf5c8}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 20% -10%,#1d4a6e 0,transparent 55%),radial-gradient(ellipse at 110% 20%,#3a2366 0,transparent 50%),var(--bg);color:var(--ink);font-family:"Trebuchet MS",system-ui,-apple-system,sans-serif;line-height:1.45}
+button,a{font:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid var(--sky);outline-offset:3px}
+.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:#0b1b2bf0;border-bottom:1px solid var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.bar a,.bar button.back{color:var(--ink);text-decoration:none;font-weight:800;min-height:44px;display:inline-flex;align-items:center;background:none;border:0;padding:0}
+.bar .title{flex:1;text-align:center;font-weight:800;font-size:17px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .count{font-weight:800;color:var(--gold);white-space:nowrap}
+main{max-width:760px;margin:0 auto;padding:16px 16px 48px}
+.eyebrow{font-size:12px;letter-spacing:.16em;font-weight:800;color:var(--lime);margin:0 0 6px}
+h1{font-size:28px;line-height:1.15;margin:0 0 8px}
+h2{font-size:22px;margin:0 0 8px}
+.muted{color:var(--muted)}
+/* lesson picker */
+.lessons{display:grid;gap:12px;margin-top:14px}
+.lesson{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px;border-radius:18px;border:2px solid var(--line);background:linear-gradient(135deg,var(--card),var(--card2));color:var(--ink)}
+.lesson .ico{flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:#0b1b2b}
+.lesson b{display:block;font-size:19px}
+.lesson small{color:var(--muted)}
+.lesson .go{margin-left:auto;font-weight:800;color:var(--lime);white-space:nowrap}
+.lesson.done{opacity:.75}
+.lesson.next{border-color:var(--lime);box-shadow:0 0 0 3px #bfff7333}
+.repair-card{border-color:var(--rose)}
+.repair-card .go{color:var(--rose)}
+/* order card */
+.order{padding:14px 16px;border-radius:16px;background:linear-gradient(120deg,#4cc9f022,#b388ff22);border:1px solid var(--line);margin-bottom:14px}
+.order p{margin:2px 0 0;font-size:17px;font-weight:700}
+/* belt */
+.belt{position:relative;padding:12px 12px 12px 46px;border-radius:20px;background:#08131f;border:3px solid #24425f;box-shadow:inset 0 0 0 2px #0e2236,0 10px 30px #0008;overflow:hidden}
+.belt::before{content:"";position:absolute;left:10px;top:0;bottom:0;width:24px;background:repeating-linear-gradient(180deg,#2b4966 0 10px,#1a3654 10px 20px);border-radius:8px;opacity:.9}
+.belt.running::before{animation:roll .6s linear 1}
+@keyframes roll{to{background-position:0 60px}}
+.slot{position:relative;min-height:62px;margin:8px 0;border-radius:14px;border:2px dashed #3a5878;display:flex;align-items:center;padding:6px}
+.slot .n{position:absolute;left:-36px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;background:#1a3654;color:var(--muted)}
+.slot.filled{border-style:solid;border-color:transparent}
+.slot.next{border-color:var(--lime)}
+.tile{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:0;background:linear-gradient(135deg,#fff8e6,#ffe9b8);color:#1c2b3a;font-size:18px;font-weight:700;line-height:1.35;box-shadow:0 3px 0 #c9a45a,0 6px 14px #0006}
+.tray .tile{background:linear-gradient(135deg,#e9f6ff,#cfe9ff);box-shadow:0 3px 0 #7fb2d8,0 6px 14px #0006;margin:10px 0}
+.tile.locked{background:linear-gradient(135deg,#eaffd2,#c8f59a);box-shadow:0 3px 0 #79b33c,0 6px 14px #0006}
+.tile.wrong{animation:shake .35s ease 1;outline:3px solid var(--rose)}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+.tray{margin-top:14px;padding:6px 12px;border-radius:20px;background:#ffffff0d;border:1px solid var(--line)}
+.tray-label{font-size:12px;letter-spacing:.14em;font-weight:800;color:var(--sky);margin:8px 2px 0}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
+.btn{min-height:48px;padding:0 16px;border-radius:14px;border:1px solid var(--line);background:var(--card2);color:var(--ink);font-weight:800}
+.btn:disabled{opacity:.4;cursor:default}
+.run{flex:1 1 220px;min-height:58px;border:0;border-radius:16px;background:var(--lime);color:#13230a;font-size:20px;font-weight:900;letter-spacing:.03em;box-shadow:0 5px 0 #7fb23f}
+.run:disabled{background:#3b4f3a;color:#9fb38f;box-shadow:none}
+.note{margin:12px 0 0;padding:12px 14px;border-radius:14px;font-weight:700}
+.note.hint{background:#4cc9f01f;border:1px solid #4cc9f055}
+.note.miss{background:#ff7c9c1f;border:1px solid #ff7c9c55}
+/* meaning check */
+.check{margin-top:16px;padding:16px;border-radius:20px;background:linear-gradient(135deg,#2a1f4d,#16304d);border:2px solid var(--violet)}
+.check h2{font-size:21px}
+.choices{display:grid;gap:10px;margin-top:10px}
+.choice{width:100%;text-align:left;padding:14px 16px;border-radius:14px;border:2px solid #4a3a7a;background:#ffffff10;color:var(--ink);font-size:18px;font-weight:700}
+.choice.right{border-color:var(--lime);background:#bfff7322}
+.choice.no{border-color:var(--rose);opacity:.6;animation:shake .35s ease 1}
+.why{margin:12px 0 0;color:var(--muted)}
+/* pass */
+.pass{text-align:center;padding:18px 0}
+.burst{font-size:64px;display:inline-block;animation:pop .5s ease-out 1}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.actions a,.actions button{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 20px;border-radius:14px;font-weight:900;text-decoration:none;border:1px solid var(--line);background:var(--card2);color:var(--ink)}
+.actions .primary{background:var(--lime);color:#13230a;border-color:var(--lime)}
+.dots{display:flex;gap:6px;justify-content:center;margin:6px 0 0}
+.dots i{width:10px;height:10px;border-radius:50%;background:#2b4966}
+.dots i.on{background:var(--lime)}
+/* spoken to screen readers only: every message is already on the screen, so nothing covers the question */
+#status{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}}
+@media (max-width:420px){.tile{font-size:17px}h1{font-size:25px}}
