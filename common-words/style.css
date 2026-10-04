@@ -24,3 +24,6 @@ button.say:hover:not(:disabled){background:#eaf2df}
 button.say span{font-size:.7em;vertical-align:middle;opacity:.7}
 .prompt button.sentence.say{display:block;margin:0 auto 14px;font-size:24px;font-weight:650}
 @media(max-width:760px){.prompt button.sentence.say{font-size:21px}}
+/* Academy home: "Continue my journey" leads. Sync is a quiet button; locked units and small print stay out of the way. */
+header .profile button[data-action="sync"]{background:#fffdf7;color:#173c39;border-color:#d0d9cd}
+.hero .small,.section-title>span,main>.note,nav[aria-label="Academy navigation"]>span,.units button:disabled{display:none}
