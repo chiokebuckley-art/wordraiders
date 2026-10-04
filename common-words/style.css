@@ -11,3 +11,10 @@
 .celebration a.button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 20px;border-radius:14px;border:1px solid #d6ddcf;background:#fffdf7;color:#193e39;font-weight:700;text-decoration:none}
 @media (max-width:700px){.focus-main .steps{margin-bottom:12px}.focus-main .explanation h1{font-size:26px}.focus-main .celebration{margin:12px auto}}
 .focus-main .steps{flex-wrap:nowrap;gap:4px}.focus-main .steps li{flex:1;min-width:0;text-align:center;padding:7px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* After an answer: the sentence, the one picture and the response. */
+.answered{max-width:640px;margin:0 auto}
+.answered .sentence{text-align:center;font-size:20px;font-weight:700;margin:0 0 10px}
+.answered-pic{padding:6px;cursor:default}
+.answered-pic svg{display:block;width:100%}
+.answered-meaning{margin:12px 0 0;padding:12px 16px;border-radius:14px;background:#e6f0da;font-size:18px}
+.answered+.feedback{max-width:640px;margin:14px auto 0}
