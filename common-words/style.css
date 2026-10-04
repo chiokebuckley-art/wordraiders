@@ -18,3 +18,9 @@
 .answered-pic svg{display:block;width:100%}
 .answered-meaning{margin:12px 0 0;padding:12px 16px;border-radius:14px;background:#e6f0da;font-size:18px}
 .answered+.feedback{max-width:640px;margin:14px auto 0}
+/* A question reads itself aloud when tapped (no separate button row). */
+button.say{display:inline;min-height:0;padding:2px 4px;border:0;background:none;color:inherit;font:inherit;font-weight:inherit;text-align:inherit;line-height:inherit;border-radius:8px;cursor:pointer}
+button.say:hover:not(:disabled){background:#eaf2df}
+button.say span{font-size:.7em;vertical-align:middle;opacity:.7}
+.prompt button.sentence.say{display:block;margin:0 auto 14px;font-size:24px;font-weight:650}
+@media(max-width:760px){.prompt button.sentence.say{font-size:21px}}
