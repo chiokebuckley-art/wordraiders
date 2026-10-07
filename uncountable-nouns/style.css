@@ -1,0 +1,4 @@
+/* Uncountable Nouns: Small Common Words' styles (../common-words/style.css) plus a few touches. */
+.chapters details summary h3{font-size:1.05rem}
+.units button div b{text-transform:none}
+.filters select optgroup{font-weight:700}
