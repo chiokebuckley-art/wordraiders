@@ -213,7 +213,7 @@
   else requestAnimationFrame(function(){ requestAnimationFrame(function(){ c.style.transform = 'translate(' + dx + 'px,' + dy + 'px)'; }); });
  }
 
- function handBack(st, step){
+ function handBack(st, step, film){
   // "Now you try": the dim and the demo go; a ring stays on the real control until the kid taps.
   var root = st.root, el = step.t ? vis(step.t()) : null;
   root.classList.add('handback'); root.querySelector('.hw-skip').textContent = 'OK';
@@ -222,6 +222,7 @@
   root.querySelector('.hw-text').textContent = step.cap || 'Now you try.';
   if (st.hear) say(step.cap || 'Now you try.');
   if (el) { if (!inView(rectOf(el))) el.scrollIntoView({ block: 'center' }); place(st, el, null); st.el = el; } else root.querySelector('.hw-spot').hidden = true;
+  if (film) return;
   var t = setTimeout(function(){ end(st); }, 9000);
   function tapAnywhere(){ clearTimeout(t); document.removeEventListener('pointerdown', tapAnywhere, true); setTimeout(function(){ end(st); }, 0); }
   setTimeout(function(){ if (!st.ended) document.addEventListener('pointerdown', tapAnywhere, true); }, 500);   // the tap that got us here must not close it
@@ -256,11 +257,44 @@
   var steps = g.steps, shown = 0;
   for (var i = 0; i < steps.length && !st.stop; i++) {
    var s = steps[i];
-   if (s.now) { if (opts.film) break; handBack(st, s); return st; }
+   if (opts.nowOnly && !s.now) continue;
+   if (s.now) { if (opts.film) { st.log && st.log(s); handBack(st, s, true); await sleep(2600); end(st); return st; } handBack(st, s); return st; }
    if (await show(st, s)) shown++;
   }
   if (!st.stop) end(st);
   return st;
+ }
+
+ // ---------- the videos: real-screen clips (MP4 + captions) recorded from the live app ----------
+ // "Show me" plays the clip (silent, captions on, Hear it reads them), then "Now you try" rings the real
+ // control. Reduce Motion, or a clip that will not load, shows the same guide as stepped stills instead.
+ function play(g){
+  if (!g) return;
+  closeOffer(); markSeen(g.id);
+  if (RM.matches) { run(g); return; }
+  kidVideo(g, function(){ run(g, { nowOnly: true }); }, function(){ run(g); });
+ }
+ function kidVideo(g, after, fallback){
+  var old = $('#wr-howto-video'); if (old) old.remove();
+  var base = ROOT + 'howto/' + g.id;
+  var el = document.createElement('div'); el.id = 'wr-howto-video'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'How-to video: ' + g.title);
+  el.innerHTML = '<div class="hwv-card"><p class="hwv-title">' + esc(g.title) + '</p>' +
+   '<video class="hwv" playsinline muted autoplay preload="auto" poster="' + base + '.jpg"><source src="' + base + '.mp4" type="video/mp4"><source src="' + base + '.webm" type="video/webm"><track kind="captions" srclang="en" label="English" src="' + base + '.vtt" default></video>' +
+   '<div class="hwv-ctl"><button type="button" class="hwv-hear" aria-pressed="false">🔊 Hear it</button><button type="button" class="hwv-again">↺ Again</button><button type="button" class="hwv-skip">Skip</button></div></div>';
+  document.body.appendChild(el);
+  var v = el.querySelector('video'), hear = false, closed = false;
+  function close(then){ if (closed) return; closed = true; hush(); try { v.pause(); } catch (e) {} el.remove(); ss(COOL, String(Date.now())); if (then) then(); }
+  function track(){ try { var tr = v.textTracks[0]; if (!tr) return; tr.mode = 'showing'; if (!tr.__wr) { tr.__wr = 1; tr.addEventListener('cuechange', function(){ var c = tr.activeCues && tr.activeCues[0]; if (hear && c && !v.paused) say(c.text); }); } } catch (e) {} }
+  track(); v.addEventListener('loadedmetadata', track);
+  v.addEventListener('ended', function(){ close(after); });
+  v.addEventListener('error', function(){ if (v.error) close(fallback); });   // the chosen copy broke while playing
+  var srcs = el.querySelectorAll('source'); srcs[srcs.length - 1].addEventListener('error', function(){ close(fallback); });   // only when no copy can play
+  var hb = el.querySelector('.hwv-hear');
+  hb.onclick = function(){ hear = !hear; hb.setAttribute('aria-pressed', String(hear)); hb.textContent = hear ? '🔇 Quiet' : '🔊 Hear it'; if (!hear) hush(); else { var tr = v.textTracks[0], c = tr && tr.activeCues && tr.activeCues[0]; if (c) say(c.text); } };
+  el.querySelector('.hwv-again').onclick = function(){ v.currentTime = 0; v.play(); };
+  el.querySelector('.hwv-skip').onclick = function(){ close(null); };
+  var p = v.play(); if (p && p.catch) p.catch(function(){});
+  el.querySelector('.hwv-skip').focus();
  }
 
  // ---------- offers (never autoplay) ----------
@@ -273,7 +307,7 @@
   el.innerHTML = '<span class="hwo-eyes" aria-hidden="true">👀</span><span class="hwo-text"><b>Want to see how?</b><small>' + esc(g.offer || g.title) + '</small></span>' +
    '<button type="button" class="hwo-go">Show me ▸</button><button type="button" class="hwo-no" aria-label="Not now">Not now</button>';
   document.body.appendChild(el); offerEl = el;
-  el.querySelector('.hwo-go').onclick = function(){ run(g); };
+  el.querySelector('.hwo-go').onclick = function(){ play(g); };
   el.querySelector('.hwo-no').onclick = function(){ markSeen(g.id); closeOffer(); ss(COOL, String(Date.now())); };
   var t = setTimeout(function(){ if (offerEl === el) { closeOffer(); if ((store()[k] || 0) >= 2) markSeen(g.id); } }, 20000);
   el.addEventListener('pointerdown', function(){ clearTimeout(t); }, { once: true });
@@ -284,7 +318,7 @@
   if (!host || host.querySelector('.hw-chip[data-g="' + id + '"]')) return;
   var b = document.createElement('button'); b.type = 'button'; b.className = 'hw-chip ' + (cls || ''); b.dataset.g = id;
   b.textContent = text; b.setAttribute('aria-label', 'Show me how: ' + guide(id).title);
-  b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); run(guide(id)); });
+  b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); play(guide(id)); });
   if (before) host.insertBefore(b, before); else host.appendChild(b);
  }
  function chips(){
@@ -321,7 +355,7 @@
  function openVideo(){
   var base = ROOT + 'howto/V0-Grownups';
   var muted = !!(gameSave().settings || {}).mute;
-  var md = modal('How the game works', '<video class="hwm-video" controls playsinline preload="metadata" poster="' + base + '.jpg"' + (muted ? ' muted' : '') + '><source src="' + base + '.mp4" type="video/mp4"><track kind="captions" srclang="en" label="English" src="' + base + '.vtt" default></video>' +
+  var md = modal('How the game works', '<video class="hwm-video" controls playsinline preload="metadata" poster="' + base + '.jpg"' + (muted ? ' muted' : '') + '><source src="' + base + '.mp4" type="video/mp4"><source src="' + base + '.webm" type="video/webm"><track kind="captions" srclang="en" label="English" src="' + base + '.vtt" default></video>' +
    '<label class="hwm-read"><input type="checkbox"> Read the captions aloud</label>' +
    '<details class="hwm-transcript"><summary>Transcript</summary><div class="hwm-lines">Loading…</div></details>');
   var v = md.el.querySelector('video'), read = md.el.querySelector('.hwm-read input');
@@ -336,14 +370,10 @@
  }
  function openReplay(){
   var kid = GUIDES.filter(function(g){ return g.kid; });
-  var md = modal('Show-me guides', '<p class="hwm-sub">Each guide shows one move on the real screen, then hands it back. Tap one to see it again.</p><div class="hwm-list">' +
-   kid.map(function(g){ return '<button type="button" class="hwm-item" data-id="' + g.id + '"><b>' + esc(g.title) + '</b><small>' + esc(g.place) + (seen(g.id) ? ' · seen' : '') + '</small></button>'; }).join('') + '</div><p class="hwm-note" aria-live="polite"></p>');
+  var md = modal('Show-me guides', '<p class="hwm-sub">Each video shows one move on the real screen. Tap one to watch it.</p><div class="hwm-list">' +
+   kid.map(function(g){ return '<button type="button" class="hwm-item" data-id="' + g.id + '"><b>▶ ' + esc(g.title) + '</b><small>' + esc(g.place) + (seen(g.id) ? ' · seen' : '') + '</small></button>'; }).join('') + '</div><p class="hwm-note" aria-live="polite"></p>');
   $$('.hwm-item', md.el).forEach(function(b){
-   b.onclick = function(){
-    var g = guide(b.dataset.id); unsee(g.id); ss(PLAY, g.id);
-    if (g.go) { md.close(); g.go(); }
-    else md.el.querySelector('.hwm-note').textContent = 'It will play the next time you open: ' + g.place + '.';
-   };
+   b.onclick = function(){ kidVideo(guide(b.dataset.id), null); };
   });
  }
  function openDailyTime(){
@@ -360,7 +390,7 @@
  window.addEventListener('hashchange', function(){ if (!/^#\/home/.test(location.hash)) document.documentElement.classList.remove('wr-journey-open'); });
 
  // ---------- watcher ----------
- function blocked(){ return document.hidden || vis($('#wr-intro-overlay')) || $('#wr-today-sheet') || $('#wr-howto-modal') || cur; }
+ function blocked(){ return document.hidden || vis($('#wr-intro-overlay')) || $('#wr-today-sheet') || $('#wr-howto-modal') || $('#wr-howto-video') || cur; }
  var pending = 0;
  function scan(){
   pending = 0;
@@ -370,7 +400,7 @@
   for (var i = 0; i < GUIDES.length; i++) {
    var g = GUIDES[i];
    if (!g.where()) continue;
-   if (forced === g.id) { ss(PLAY, null); setTimeout(function(gg){ return function(){ run(gg); }; }(g), 400); return; }
+   if (forced === g.id) { ss(PLAY, null); setTimeout(function(gg){ return function(){ play(gg); }; }(g), 400); return; }
   }
   if (offerEl) { var still = GUIDES.filter(function(g){ return g.id === offerEl.dataset.g; })[0]; if (still && !still.where()) closeOffer(); return; }
   var cool = +ss(COOL) || 0; if (Date.now() - cool < 120000) return;
@@ -436,8 +466,15 @@
  '#wr-howto-modal .hwm-item{font:inherit;text-align:left;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:14px;border:1px solid #2b4966;background:#1a3654;color:#f4f7fb;cursor:pointer;min-height:52px}' +
  '#wr-howto-modal .hwm-item small{color:#b8c7da}#wr-howto-modal .hwm-note{color:#bfff73;font-weight:800;min-height:1.4em}' +
  'html.wr-journey-open .sl-journey{display:block!important}' +
+ '#wr-howto-video{position:fixed;inset:0;z-index:9997;background:rgba(4,10,20,.86);display:flex;align-items:center;justify-content:center;padding:12px;font-family:Andika,Arial,sans-serif}' +
+ '#wr-howto-video .hwv-card{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:100%}' +
+ '#wr-howto-video .hwv-title{margin:0;color:#bfff73;font-weight:900;font-size:18px;text-align:center}' +
+ '#wr-howto-video video{display:block;height:min(74vh,calc((100vw - 24px) * 16 / 9));aspect-ratio:9/16;max-width:100%;border-radius:18px;border:3px solid #bfff73;background:#000}' +
+ '#wr-howto-video video::cue{font-size:1.1em;line-height:1.3;background:rgba(0,0,0,.78);color:#fff}' +
+ '#wr-howto-video .hwv-ctl{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}' +
+ '#wr-howto-video .hwv-ctl button{font:inherit;min-height:48px;padding:0 18px;border-radius:14px;border:1px solid #2b4966;background:#1a3654;color:#f4f7fb;font-weight:900;cursor:pointer;touch-action:manipulation}' +
  '@media (prefers-reduced-motion:reduce){#wr-howto *,#wr-howto-offer{transition:none!important;animation:none!important}}';
  var st = document.createElement('style'); st.id = 'wr-howto-style'; st.textContent = css; (document.head || document.documentElement).appendChild(st);
 
- window.__wrHowto = { guides: GUIDES, run: function(id, o){ var g = typeof id === 'string' ? guide(id) : id; return g ? run(g, o) : null; }, end: function(){ if (cur) end(cur); }, seen: seen, unsee: unsee, openVideo: openVideo, openReplay: openReplay, openDailyTime: openDailyTime };
+ window.__wrHowto = { guides: GUIDES, play: function(id){ play(guide(id)); }, run: function(id, o){ var g = typeof id === 'string' ? guide(id) : id; return g ? run(g, o) : null; }, end: function(){ if (cur) end(cur); }, seen: seen, unsee: unsee, openVideo: openVideo, openReplay: openReplay, openDailyTime: openDailyTime };
 })();
