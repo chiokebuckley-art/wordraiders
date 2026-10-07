@@ -8,7 +8,7 @@
  function put(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
  function sum2(stars){var n=0;for(var k in stars||{})n+=Math.min(2,stars[k]||0);return n}
  function questPoints(e){return sum2(e.quest&&e.quest.stars)}
- function spellPoints(e){var s=e.spelling;return s?(s.intro?1:0)+sum2(s.stars):0}
+ function spellPoints(e){var s=e.spelling;return s?sum2(s.stars):0}  // meeting Echo is not a task done
 
  // Points at the start of the day, per player: today's quest rows tick once these go up.
  function base(e,day,from){
@@ -65,9 +65,11 @@
   if(shown.keys.indexOf(flipped.key)>=0)return;
   shown.keys.push(flipped.key);put(SHOWN,shown);
   var up=after.find(function(r){return!r.done&&!r.later});
-  setTimeout(function(){sheet(flipped,up)},900);
+  whenResting(function(){sheet(flipped,up)});
  };
 
+ // Wait until the lesson is over (the tab bar is back and no how-to is running) so the card never covers the lesson's own buttons.
+ function whenResting(fn){var t0=Date.now();(function check(){if(document.querySelector('nav.sl-tabs')&&!document.getElementById('wr-howto')){setTimeout(fn,700);return}if(Date.now()-t0<15*60*1000)setTimeout(check,600)})()}
  function goHome(){
   try{if(location.hash==='#/home')history.replaceState(null,'',location.pathname+location.search+'#/');location.hash='#/home'}
   catch(e){location.href='./#/home'}
