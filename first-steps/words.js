@@ -1,0 +1,5 @@
+// F1–F2 single words: decodable 1st-grade nouns and verbs that already have a clear WordRaiders word picture
+// (word-pics/<word>-<noun|verb>.webp). Each was checked by eye; unclear pictures (map, lip, clap, nod, hunt…) are left out.
+export const NOUNS = ['cat','dog','sun','bed','pig','hat','hen','cup','box','mud','fox','bus','van','fan','egg','ant','bat','rat','pot','rug','mop','jam','bag','sock','duck','fish','frog','ship','shell','bell','doll','ball','nest','drum','crab','clock','truck','sled','tent','milk','hand','ring','rock','bib','yak','lamp','desk','plum','gift','pen'];
+export const VERBS = ['hop','dig','sit','run','nap','jump','swim','hug','kick','sing','cut','tap','zip','skip','spin','sniff','fill','hum','sip','hit','kiss','jog','grab','drip','spill','swing','fix','sweep','wash','sleep','eat','cry','read','rest','bake','ride','lick','dance','drink','smell','melt','plant','pull','push'];
+export const pic = (w, pos) => `../word-pics/${w}-${pos === 'naming' ? 'noun' : 'verb'}.webp`;

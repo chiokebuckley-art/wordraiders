@@ -19,10 +19,12 @@ const C = {
  bear: (c = '#8a5a36') => `<ellipse cx="-4" cy="6" rx="26" ry="22" fill="${c}"/><circle cx="18" cy="-14" r="14" fill="${c}"/><circle cx="10" cy="-26" r="5" fill="${c}"/><circle cx="26" cy="-26" r="5" fill="${c}"/><circle cx="22" cy="-16" r="2" fill="${INK}"/><circle cx="31" cy="-10" r="2.5" fill="${INK}"/><path d="M-20 26V30M-6 26V30M8 26V30" stroke-width="5"/>`,
  girl: (c = '#f28b82') => `<circle cy="-22" r="13" fill="#e0a560"/><path d="M-13-24Q-14-40 0-38Q14-40 13-24Q8-32 0-30Q-8-32-13-24Z" fill="#5a3a22"/><path d="M-14 16-8-8H8L14 16Z" fill="${c}"/><path d="M-5 16V30M5 16V30M-8-4-16 8M8-4 16 8" fill="none" stroke-width="3.5"/><circle cx="5" cy="-23" r="1.8" fill="${INK}"/>`,
  boy: (c = '#8fb5c0') => `<circle cy="-22" r="13" fill="#b97d53"/><path d="M-13-26Q-12-38 0-37Q12-38 13-26Q6-31 0-29Q-6-31-13-26Z" fill="#2f2f2f"/><path d="M-11 12V-8H11V12Z" fill="${c}"/><path d="M-6 12V30M6 12V30M-9-4-17 8M9-4 17 8" fill="none" stroke-width="3.5"/><circle cx="5" cy="-23" r="1.8" fill="${INK}"/>`,
+ hen: (c = '#f4f1ea') => `<path d="M-24 2Q-28-20-6-18Q4-30 16-24Q24-18 20-6L28-4 20 2Q18 22-4 22Q-22 22-24 2Z" fill="${c}"/><path d="M10-26q2-8 6-4q2-6 6 0q-4 2-6 4Z" fill="#e0533d"/><path d="M-26-4q-10-8-6-16q6 4 8 10" fill="${c}"/><path d="M-4 22V32M6 22V32M-8 32h8M2 32h8" fill="none" stroke-width="3"/><path d="M14-4l8 6" stroke="#e0533d" stroke-width="3"/><circle cx="14" cy="-16" r="2.4" fill="${INK}"/><path d="M-12 0q8 8 16 0" fill="none" stroke-width="2"/>`,
+ pig: (c = '#f4a6b4') => `<path d="M-30 4Q-30-18-6-18H14Q32-18 32 2Q32 18 14 18H-12Q-30 18-30 4Z" fill="${c}"/><ellipse cx="34" cy="0" rx="7" ry="8" fill="#ee8fa0"/><circle cx="33" cy="-2" r="1.4" fill="${INK}"/><circle cx="36" cy="2" r="1.4" fill="${INK}"/><path d="M14-18l6-10 6 10" fill="#ee8fa0"/><circle cx="22" cy="-8" r="2.3" fill="${INK}"/><path d="M-20 18V32M-8 18V32M8 18V32M20 18V32" fill="none" stroke-width="4.5"/><path d="M-30 0q-8-2-6-8q4-2 2 4" fill="none" stroke-width="2.5"/>`,
  grownup: (c = '#3b4f8a') => `<circle cy="-30" r="13" fill="#e8b48a"/><path d="M-13-34Q-10-46 0-45Q12-46 13-34Z" fill="#9aa5a8"/><path d="M-13 12V-16H13V12Z" fill="${c}"/><path d="M-7 12V32M7 12V32M-11-12-19 4M11-12 19 4" fill="none" stroke-width="3.5"/><circle cx="5" cy="-31" r="1.8" fill="${INK}"/>`
 };
 export const CAST = Object.keys(C);
-export const POSES = ['stand','run','jump','sit','sleep','fly','hang','swim','climb','fall','happy','sad','scared','eat','hide'];
+export const POSES = ['stand','run','jump','sit','sleep','fly','hang','swim','climb','fall','happy','sad','scared','eat','hide','dig','bark','wet','peck'];
 export const PLACES = ['grass','park','cave','inside','night','pond','beach','snow','rain','road','kitchen','sky','forest','hill','school'];
 
 function actor(a){
@@ -32,18 +34,24 @@ function actor(a){
  if (pose === 'hang') rot = 180;
  if (pose === 'climb') rot = -60;
  if (pose === 'fall') rot = 35;
+ if (pose === 'dig' || pose === 'peck') rot = 22;
  if (pose === 'sit') body = `<g transform="translate(0 6) scale(1 .85)">${body}</g>`;
  if (pose === 'sleep') { rot = a.c === 'bat' ? 180 : 0; extra += `<text x="${18 * flip}" y="-34" font-family="system-ui" font-size="16" font-weight="700" fill="${INK}" stroke="none" transform="scale(${flip} 1)">z z</text>`; }
- let g = `<g transform="translate(${x} ${y}) scale(${s * flip} ${s}) rotate(${rot})" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">${body}</g>`;
+ const lift = pose === 'jump' ? 40 * s : 0;   // a jump lifts the character clear of the ground
+ let g = `<g transform="translate(${x} ${y - lift}) scale(${s * flip} ${s}) rotate(${rot})" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">${body}</g>`;
  const fx = (dx) => x - dx * s * flip;
  if (pose === 'run') g += [0, 1, 2].map(i => `<path d="M${fx(40 + i * 2)} ${y - 8 + i * 10}h${-16 * flip}" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`).join('');
- if (pose === 'jump') g += `<path d="M${fx(30)} ${y + 34 * s}q${12 * flip} -14 ${26 * flip} 0" fill="none" stroke="${INK}" stroke-width="2.5" stroke-dasharray="4 4"/>`;
+ if (pose === 'jump') g += `<path d="M${fx(52)} ${y + 32 * s}q${18 * flip} -40 ${44 * flip} -36" fill="none" stroke="${INK}" stroke-width="2.5" stroke-dasharray="5 5"/><ellipse cx="${x}" cy="${y + 32 * s}" rx="${22 * s}" ry="${4 * s}" fill="#0003" stroke="none"/>` + [-14, 0, 14].map(d => `<path d="M${x + d * s} ${y + 18 * s - lift}v${12 * s}" stroke="${INK}" stroke-width="2" stroke-linecap="round" opacity=".6"/>`).join('');
  if (pose === 'fly') g += `<path d="M${fx(46)} ${y - 4}q${-10 * flip} -8 ${-20 * flip} 0M${fx(46)} ${y + 8}q${-10 * flip} -8 ${-20 * flip} 0" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
- if (pose === 'swim') g += `<path d="M${x - 40 * s} ${y + 18 * s}q10 -6 20 0t20 0t20 0t20 0" fill="none" stroke="#4c8fd6" stroke-width="3"/>`;
+ if (pose === 'swim') g += `<ellipse cx="${x}" cy="${y + 18 * s}" rx="${50 * s}" ry="${15 * s}" fill="#7cc4e8" stroke="#4c8fd6" stroke-width="3"/><path d="M${x - 30 * s} ${y + 14 * s}q${8 * s} -5 ${16 * s} 0M${x + 10 * s} ${y + 20 * s}q${8 * s} -5 ${16 * s} 0" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>`;
  if (pose === 'happy') g += sym('heart', x + 26 * s * flip, y - 40 * s, .35 * s);
  if (pose === 'sad') g += sym('drop', x + 22 * s * flip, y - 30 * s, .25 * s);
  if (pose === 'scared') g += `<path d="M${x - 14 * s} ${y - 46 * s}l-4 -10M${x} ${y - 50 * s}v-11M${x + 14 * s} ${y - 46 * s}l4 -10" stroke="${INK}" stroke-width="2.5"/>`;
  if (pose === 'eat') g += sym('apple', x + 40 * s * flip, y - 4 * s, .35 * s);
+ if (pose === 'dig') g += sym('dirt', x + 34 * s * flip, y + 26 * s, .45 * s, '#8a5a36');
+ if (pose === 'peck') g += `<circle cx="${x + 40 * s * flip}" cy="${y + 28 * s}" r="3" fill="#c9a227"/><circle cx="${x + 48 * s * flip}" cy="${y + 30 * s}" r="3" fill="#c9a227"/>`;
+ if (pose === 'bark') g += [0, 1, 2].map(i => `<path d="M${x + (44 + i * 9) * s * flip} ${y - 26 * s}q${6 * flip} 8 0 16" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>`).join('');
+ if (pose === 'wet') g += [[-20, -50], [8, -58], [30, -40], [-34, -20]].map(([dx, dy]) => sym('drop', x + dx * s, y + dy * s, .22 * s, '#7cc4e8')).join('');
  if (pose === 'hide') g = `<g opacity=".55">${g}</g>`;
  return g + extra;
 }

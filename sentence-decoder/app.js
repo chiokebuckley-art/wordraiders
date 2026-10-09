@@ -1,16 +1,18 @@
 // Sentence Decoder: one round = one sentence (or a two-sentence passage at L4), decoded in four stages:
 // 1 Word jobs & meanings · 2 Word parts · 3 What does it mean? · 4 Show it (order the panels, throw one out).
 // Wrong answers get a one-line hint and one retry, then the answer is shown and the round goes on. Untimed.
-import {ITEMS} from './items.js?v=sd-1';
+import {ITEMS} from './items.js?v=sd-2';
 import {PARTS} from './parts.js?v=sd-1';
-import {fresh, nextItem, record, tally, partFoils, splitPoints, sameSplit, shuffled, mastered} from './engine.js?v=sd-1';
-import {panel} from './art.js?v=sd-1';
+import {fresh, nextItem, record, tally, partFoils, splitPoints, sameSplit, shuffled, mastered} from './engine.js?v=sd-2';
+import {panel} from './art.js?v=sd-2';
 
 const app = document.querySelector('#app');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // ---------- player + save ----------
 function player(){ try { const r = JSON.parse(localStorage.getItem('wordraiders.players.v1') || 'null'); const p = r && Array.isArray(r.profiles) ? r.profiles.find(x => x.id === r.active) : null; return p ? { id: p.id, name: p.name } : { id: 'guest', name: 'Explorer' }; } catch { return { id: 'guest', name: 'Explorer' }; } }
 const P = player(), KEY = `wr-decoder.${P.id}`;
+// Opened from First Steps F11 (Graduation): play level-1 rounds and offer the way back.
+const FROM_FS = new URLSearchParams(location.search).get('from') === 'first-steps';
 let S; try { S = { ...fresh(), ...(JSON.parse(localStorage.getItem(KEY) || 'null') || {}) }; } catch { S = fresh(); }
 function persist(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} }
 function addXp(n){ if (P.id === 'guest') return; try { const k = `wordraiders.save.${P.id}`, raw = JSON.parse(localStorage.getItem(k) || '{}'); raw.xp = (Number(raw.xp) || 0) + n; raw.savedAt = Date.now(); localStorage.setItem(k, JSON.stringify(raw)); } catch {} }
@@ -50,7 +52,7 @@ function wordChip(t){
  return `<button class="${cls}" data-act="word" data-key="${t.key}">${esc(t.t)}${tag}</button>`;
 }
 function stageBar(){ const st = ['words', 'parts', 'meaning', 'pictures'].filter(s => s !== 'parts' || R.hasParts); const names = { words: 'Words', parts: 'Parts', meaning: 'Meaning', pictures: 'Show it' }; return `<ol class="stages">${st.map((s, i) => `<li class="${R.stage === s ? 'on' : st.indexOf(R.stage) > i || R.stage === 'result' ? 'past' : ''}">${i + 1}. ${names[s]}</li>`).join('')}</ol>`; }
-function bar(){ return `<div class="bar"><a href="../?journey" class="back">← WordRaiders</a><span class="title">Sentence Decoder · L${R ? R.item.level : S.level}</span><span class="count">${esc(P.name)}</span></div>`; }
+function bar(){ return `<div class="bar"><a href="${FROM_FS ? '../first-steps/?grad=1' : '../?journey'}" class="back">${FROM_FS ? '← First Steps' : '← WordRaiders'}</a><span class="title">Sentence Decoder · L${R ? R.item.level : S.level}</span><span class="count">${esc(P.name)}</span></div>`; }
 
 function home(){
  R = null;
@@ -60,7 +62,7 @@ function home(){
  <button class="primary big" data-act="start" data-level="${S.level}">Decode a sentence ▸</button>
  <p class="muted small">You’re on level ${S.level}. ${recent.length ? `${m} of your last ${recent.length} sentences fully decoded.` : 'Get most of your last 5 right to move up a level.'}</p>
  <h2>Levels</h2><div class="levels">${lv}</div>
- <details class="about"><summary>How it works (for grown-ups)</summary><p>Each round: tag the key words (part of speech, then the meaning in this sentence), find and split words with prefixes or suffixes from WordRaiders’ 45 word parts, choose the right meaning of the whole sentence, and order picture panels while throwing out the one that gets it wrong. Wrong answers get a one-line hint and one retry. Sentences don’t repeat until a level’s pool is used up; then missed ones come back first. Moving up needs 4 of the last 5 fully decoded; struggling with meaning or pictures moves back a level. Untimed.</p><p>Why these steps: knowing the right meaning of a many-meaning word in context predicts reading comprehension; word-part teaching helps most alongside other reading work; and “who did what” traps (including sentences like “The cat was chased by the dog”) catch the common habit of treating the first noun as the doer.</p></details></main>`;
+ <p class="small">New reader? <a href="../first-steps/" style="color:var(--lime)">Start with First Steps</a>: picture words and tiny sentences for 1st grade.</p><details class="about"><summary>How it works (for grown-ups)</summary><p>Each round: tag the key words (part of speech, then the meaning in this sentence), find and split words with prefixes or suffixes from WordRaiders’ 45 word parts, choose the right meaning of the whole sentence, and order picture panels while throwing out the one that gets it wrong. Wrong answers get a one-line hint and one retry. Sentences don’t repeat until a level’s pool is used up; then missed ones come back first. Moving up needs 4 of the last 5 fully decoded; struggling with meaning or pictures moves back a level. Untimed.</p><p>Why these steps: knowing the right meaning of a many-meaning word in context predicts reading comprehension; word-part teaching helps most alongside other reading work; and “who did what” traps (including sentences like “The cat was chased by the dog”) catch the common habit of treating the first noun as the doer.</p></details></main>`;
 }
 
 function wordsView(){
@@ -139,7 +141,7 @@ function finish(){ const res = record(S, R.item, R.stars); persist(); const m = 
 function resultView(){ const st = R.stars, list = [['words', 'Words'], ...(R.hasParts ? [['parts', 'Parts']] : []), ['meaning', 'Meaning'], ['pictures', 'Pictures']];
  const res = R.result; return stageBar() + `<section class="result"><div class="burst">${res.mastered ? '🔓' : '🔑'}</div><h1>${res.mastered ? 'Decoded!' : 'Good work!'}</h1><p class="sc-text">${esc(R.item.sentences.map(s => s.text).join(' '))}</p><div class="stars">${list.map(([k, l]) => `<span class="${st[k] ? 'on' : ''}">${st[k] ? '★' : '☆'} ${l}</span>`).join('')}</div>
  ${res.moved === 'up' ? `<p class="move up">⬆ Level up! You’re on level ${S.level} now.</p>` : res.moved === 'down' ? `<p class="move">Let’s practise level ${S.level} a bit more.</p>` : ''}<p class="muted">+${res.mastered ? 10 : 5} XP</p>
- <div class="actions"><button class="primary" data-act="start" data-level="${S.level}">Next sentence ▸</button><a class="btn" href="../?journey">Back to Home</a></div></section>`; }
+ <div class="actions"><button class="primary" data-act="start" data-level="${FROM_FS ? 1 : S.level}">Next sentence ▸</button>${FROM_FS ? `<a class="btn" href="../first-steps/?grad=1">Back to First Steps</a>` : `<a class="btn" href="../?journey">Back to Home</a>`}</div></section>`; }
 function goStage(s){ R.stage = s; R.msg = ''; R.picked = null; }
 let flashT = 0; function flash(t){ const el = document.querySelector('#status'); el.textContent = t; clearTimeout(flashT); flashT = setTimeout(() => { el.textContent = ''; }, 3500); }
 
@@ -170,4 +172,4 @@ app.addEventListener('click', e => { const b = e.target.closest('[data-act]'); i
  else if (a === 'checkpics') { if (R.reveal) { R.reveal = false; finish(); } else onCheckPics(); }
  persist(); render();
 });
-home();
+if (FROM_FS) startRound(1); else home();
