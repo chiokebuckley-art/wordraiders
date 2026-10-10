@@ -5,7 +5,7 @@ import {ITEMS} from './items.js?v=sd-2';
 import {PARTS} from './parts.js?v=sd-1';
 import {fresh, nextItem, record, tally, partFoils, splitPoints, sameSplit, shuffled, mastered} from './engine.js?v=sd-2';
 import {panel} from './art.js?v=sd-2';
-import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=1';
+import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=3';
 
 const app = document.querySelector('#app');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

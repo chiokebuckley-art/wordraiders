@@ -7,7 +7,7 @@ import {ITEMS} from './items.js?v=fs-1';
 import {NOUNS, VERBS, pic} from './words.js?v=fs-1';
 import {nextItem, shuffled} from '../sentence-decoder/engine.js?v=sd-2';
 import {panel} from '../sentence-decoder/art.js?v=fs-1';
-import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=1';
+import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=3';
 
 const app = document.querySelector('#app');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

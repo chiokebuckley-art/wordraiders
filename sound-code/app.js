@@ -4,7 +4,7 @@
 // words never practised. No timers, no speech recognition: tasks are scored by what the learner taps; reading
 // aloud is self-checked, or scored by a helper with the blueprint's prompt levels.
 import {MODULE_CONTENT as C} from './content.js?v=sc-1';
-import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=1';
+import {speak, blocked as voiceBlocked, voiceList, pickVoice, setVoice, isIOS, settings as voiceSettings} from '../wr-voice.js?v=3';
 import {UNITS, MODULES, spell, taughtBy} from './inventory.js?v=sc-1';
 import {fresh, modState, buildSession, checkSession, finishSession, probeItems, module0, letterPositions, shuffled, dayKey, addDays} from './engine.js?v=sc-1';
 
@@ -222,7 +222,14 @@ function settingsView(){
  return `<details class="about"><summary>Settings</summary>
  <label class="tog"><input type="checkbox" data-act="helper" ${S.helper ? 'checked' : ''}> A helper listens when I read aloud (they score how much help was needed)</label>
  <label class="tog">Learner: <select data-act="learner-sel"><option value="kid" ${kid() ? 'selected' : ''}>Young reader</option><option value="adult" ${!kid() ? 'selected' : ''}>Older reader or adult</option></select></label>
+ ${voiceView()}
  ${S.placed ? `<button class="linkish" data-act="replace">Run the starting check again</button>` : ''}</details>`;
+}
+function voiceView(){
+ const vs = voiceList(), cur = voiceSettings().voice, best = vs[0];
+ if (!vs.length) return `<p class="small muted">Reading voice: your device's default voice.</p>`;
+ return `<label class="tog">Reading voice: <select data-act="voice-sel"><option value="" ${!cur ? 'selected' : ''}>Best on this device (${esc(pickVoice() && !cur ? pickVoice().name : best && !isIOS() ? best.name : 'device voice')})</option>${vs.map(v => `<option value="${esc(v.name)}" ${cur === v.name ? 'selected' : ''}>${esc(v.name)} · ${esc(v.lang)}</option>`).join('')}</select></label>
+ <p class="small muted">Using: <b>${esc(pickVoice()?.name || 'this device’s own voice (from its Settings)')}</b>. This is the same voice setting as the rest of WordRaiders. <button class="linkish" data-act="say" data-text="This is how words will sound.">▶ Test</button></p>`;
 }
 function aboutView(){
  return `<details class="about"><summary>How Sound Code works</summary>
@@ -263,6 +270,7 @@ function render(){
 app.addEventListener('change', e => { const a = e.target.dataset.act;
  if (a === 'helper') S.helper = e.target.checked;
  if (a === 'learner-sel') S.learner = e.target.value;
+ if (a === 'voice-sel') { setVoice(e.target.value); say('This is how words will sound.'); }
  persist(); render(); });
 app.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b || b.disabled || b.tagName === 'INPUT' || b.tagName === 'SELECT') return; const a = b.dataset.act;
  if (a === 'say') { if (b.dataset.text) say(b.dataset.text); return; }
