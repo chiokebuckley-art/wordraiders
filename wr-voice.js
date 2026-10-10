@@ -14,15 +14,22 @@ function score(v){
  const r = `${v.name} ${v.voiceURI ?? ''}`.toLowerCase();
  if (/premium/i.test(r)) n += 14; else if (/enhanced|natural|neural|online/i.test(r)) n += 10; else if (/compact/i.test(r)) n -= 12;
  if (/samantha/i.test(t)) n += 2;
- if (/compact|eloquence|fred|zarvox|albert|bad news|bells|boing|bubbles|cellos|deranged|good news|jester|organ|superstar|trinoids|whisper|wobble|junior|kathy|ralph|grandma|grandpa|rocko|shelley|eddy|flo|reed|sandy/i.test(t)) n -= 20;
+ if (/compact|eloquence|fred|zarvox|albert|bad news|bells|boing|bubbles|cellos|deranged|good news|jester|organ|superstar|trinoids|whisper|wobble|junior|kathy|ralph|grandma|grandpa|rocko|shelley|eddy|flo|reed|sandy|bahh|hysterical|princess/i.test(t)) n -= 20;
  return n;
 }
 let cache = [];
 function voices(){ try { const v = speechSynthesis.getVoices().filter(x => /^en/i.test(x.lang)).sort((a, b) => score(b) - score(a) || a.name.localeCompare(b.name)); if (v.length) cache = v; } catch {} return cache; }
 if (typeof window !== 'undefined' && 'speechSynthesis' in window) { voices(); try { speechSynthesis.addEventListener('voiceschanged', voices); } catch {} }
+export const voiceList = () => voices();
+/** Save the player's reading voice in their WordRaiders settings ('' = best on this device), so the whole app uses it. */
+export function setVoice(name){ try { const r = JSON.parse(localStorage.getItem('wordraiders.players.v1') || 'null'), id = r && r.active; if (!id) return false; const k = `wordraiders.save.${id}`, raw = JSON.parse(localStorage.getItem(k) || '{}') || {}; raw.settings = { ...(raw.settings || {}), voice: String(name || '').slice(0, 80) }; raw.savedAt = Date.now(); localStorage.setItem(k, JSON.stringify(raw)); return true; } catch { return false; } }
 export function pickVoice(){ const vs = voices(); if (!vs.length) return null; const want = settings().voice;
  if (want) { const w = want.toLowerCase(); const hit = vs.find(v => v.name === want || v.voiceURI === want || v.name.toLowerCase() === w || (v.voiceURI && v.voiceURI.toLowerCase() === w)); if (hit) return hit; }
+ // On iPhone/iPad, the voice set in iOS Settings (often a Siri voice) isn't in the list a web page sees. When the
+ // device only offers basic voices, leave the voice unset so iOS reads with its own system voice.
+ if (isIOS() && vs[0] && score(vs[0]) < 15) return null;
  return vs[0] || null; }
+export const isIOS = () => typeof navigator !== 'undefined' && (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
 /** Why speech can't play right now (a short message), or '' when it can. */
 export function blocked(){ const s = settings();
  if (s.mute || !s.speech) return 'Reading is off. Turn on voice reading in WordRaiders settings to listen.';
