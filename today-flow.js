@@ -25,6 +25,16 @@
   return{label:open?'Spelling Quest · '+c.name:'Spelling Quest · Boss: '+c.boss.name,done:false};
  }
 
+ // Sound Code (a standalone page): today's decoding session, read from its own per-player save.
+ function soundRow(now){
+  var id=null;try{var r=JSON.parse(localStorage.getItem('wordraiders.players.v1')||'null');id=r&&r.active}catch(e){}
+  if(!id)return null;
+  var s=get('wr-soundcode.'+id,null),d=new Date(now),day=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  if(!s||!s.placed)return{key:'sound',label:'Sound Code · find your starting point',done:false,later:false,meta:'5 min'};
+  var m=s.mods&&s.mods[s.module]||{},lab=m.state==='checkA'||m.state==='checkB'?'Sound Code · mastery check':'Sound Code · module '+s.module;
+  return{key:'sound',label:lab,done:!!(s.days&&s.days[day]&&s.days[day].done),later:false,meta:'7 min'};
+ }
+
  // The rows without their buttons: also used to spot a row going from not done to done.
  function rows(e,now,K,jr,jtitle,from){
   var day=K.Sy(now),b=base(e,day,from),box=K.tL(e,now),raidDone=e.quest.raidDay===day,raidReady=K.Ry(e,now).length>0;
@@ -35,6 +45,7 @@
   var qd=questPoints(e)>b.q;out.push({key:'quest',label:qd&&q.kind!=='done'?'Word Quest · done for today':ql,done:q.kind==='done'||qd,later:false,meta:'3 min'});
   var sp=spellNext(e,K);
   var sd=spellPoints(e)>b.s;out.push({key:'spell',label:sd&&!sp.done?'Spelling Quest · done for today':sp.label,done:sp.done||sd,later:false,meta:'3 min'});
+  var sc=soundRow(now);if(sc)out.push(sc);
   out.push({key:'picture',label:'Picture Thinking',done:K.ptDone?K.ptDone(e.pictureThinking,now):false,later:false,meta:'3 min'});
   out.push({key:'raid',label:raidReady||raidDone?'Daily Raid':'Daily Raid · after your first boss',done:raidDone,later:!raidDone&&!raidReady,meta:raidDone?'done':raidReady?'4 min':'later'});
   return out;
@@ -45,7 +56,7 @@
   var K=window.__wrK;if(!K)return null;
   var jr=!!a.jr;last={jr:jr,jtitle:a.journey.title};
   var list=rows(a.player,a.now,K,jr,a.journey.title);
-  var go={box:a.onBox,journey:a.journey.go,quest:a.onQuest,spell:a.onSpell,picture:a.onPicture,raid:a.onRaid};
+  var go={sound:function(){location.href='./sound-code/?today=1'},box:a.onBox,journey:a.journey.go,quest:a.onQuest,spell:a.onSpell,picture:a.onPicture,raid:a.onRaid};
   list.forEach(function(r){r.go=go[r.key]});
   var nxt=null;try{nxt=sessionStorage.getItem(NEXT)}catch(e){}
   if(nxt){try{sessionStorage.removeItem(NEXT)}catch(e){}
@@ -74,7 +85,7 @@
   try{if(location.hash==='#/home')history.replaceState(null,'',location.pathname+location.search+'#/');location.hash='#/home'}
   catch(e){location.href='./#/home'}
  }
- var NAMES={picture:'Picture Thinking',box:'Word box',quest:'Word Quest',spell:'Spelling Quest',raid:'Daily Raid',journey:'Journey'};
+ var NAMES={sound:'Sound Code',picture:'Picture Thinking',box:'Word box',quest:'Word Quest',spell:'Spelling Quest',raid:'Daily Raid',journey:'Journey'};
  function sheet(done,up){
   var old=document.getElementById('wr-today-sheet');if(old)old.remove();
   var el=document.createElement('div');el.id='wr-today-sheet';el.setAttribute('role','dialog');el.setAttribute('aria-label','Task done');
