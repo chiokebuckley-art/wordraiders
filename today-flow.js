@@ -45,6 +45,7 @@
   var qd=questPoints(e)>b.q;out.push({key:'quest',label:qd&&q.kind!=='done'?'Word Quest · done for today':ql,done:q.kind==='done'||qd,later:false,meta:'3 min'});
   var sp=spellNext(e,K);
   var sd=spellPoints(e)>b.s;out.push({key:'spell',label:sd&&!sp.done?'Spelling Quest · done for today':sp.label,done:sp.done||sd,later:false,meta:'3 min'});
+  var dd=window.__wrDefinitionsStatus&&window.__wrDefinitionsStatus(e,now);if(dd&&(dd.available||dd.done))out.push({key:'definitions',label:'Daily Definitions'+(dd.done?' · done':' · '+dd.count+' cards'),done:dd.done,later:false,meta:dd.done?'done':'~'+dd.minutes+' min'});
   var sc=soundRow(now);if(sc)out.push(sc);
   out.push({key:'picture',label:'Picture Thinking',done:K.ptDone?K.ptDone(e.pictureThinking,now):false,later:false,meta:'3 min'});
   out.push({key:'raid',label:raidReady||raidDone?'Daily Raid':'Daily Raid · after your first boss',done:raidDone,later:!raidDone&&!raidReady,meta:raidDone?'done':raidReady?'4 min':'later'});
@@ -56,7 +57,7 @@
   var K=window.__wrK;if(!K)return null;
   var jr=!!a.jr;last={jr:jr,jtitle:a.journey.title};
   var list=rows(a.player,a.now,K,jr,a.journey.title);
-  var go={sound:function(){location.href='./sound-code/?today=1'},box:a.onBox,journey:a.journey.go,quest:a.onQuest,spell:a.onSpell,picture:a.onPicture,raid:a.onRaid};
+  var go={definitions:function(){location.href='./daily-definitions/'},sound:function(){location.href='./sound-code/?today=1'},box:a.onBox,journey:a.journey.go,quest:a.onQuest,spell:a.onSpell,picture:a.onPicture,raid:a.onRaid};
   list.forEach(function(r){r.go=go[r.key]});
   var nxt=null;try{nxt=sessionStorage.getItem(NEXT)}catch(e){}
   if(nxt){try{sessionStorage.removeItem(NEXT)}catch(e){}
@@ -85,7 +86,7 @@
   try{if(location.hash==='#/home')history.replaceState(null,'',location.pathname+location.search+'#/');location.hash='#/home'}
   catch(e){location.href='./#/home'}
  }
- var NAMES={sound:'Sound Code',picture:'Picture Thinking',box:'Word box',quest:'Word Quest',spell:'Spelling Quest',raid:'Daily Raid',journey:'Journey'};
+ var NAMES={definitions:'Daily Definitions',sound:'Sound Code',picture:'Picture Thinking',box:'Word box',quest:'Word Quest',spell:'Spelling Quest',raid:'Daily Raid',journey:'Journey'};
  function sheet(done,up){
   var old=document.getElementById('wr-today-sheet');if(old)old.remove();
   var el=document.createElement('div');el.id='wr-today-sheet';el.setAttribute('role','dialog');el.setAttribute('aria-label','Task done');
