@@ -5,6 +5,7 @@ import {ITEMS} from './items.js?v=sd-2';
 import {PARTS} from './parts.js?v=sd-1';
 import {fresh, nextItem, record, tally, partFoils, splitPoints, sameSplit, shuffled, mastered} from './engine.js?v=sd-2';
 import {panel} from './art.js?v=sd-2';
+import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=1';
 
 const app = document.querySelector('#app');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -17,9 +18,8 @@ let S; try { S = { ...fresh(), ...(JSON.parse(localStorage.getItem(KEY) || 'null
 function persist(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} }
 function addXp(n){ if (P.id === 'guest') return; try { const k = `wordraiders.save.${P.id}`, raw = JSON.parse(localStorage.getItem(k) || '{}'); raw.xp = (Number(raw.xp) || 0) + n; raw.savedAt = Date.now(); localStorage.setItem(k, JSON.stringify(raw)); } catch {} }
 // ---------- speech ----------
-function voice(){ try { const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang)); const q = v => { const t = v.name + ' ' + (v.voiceURI || ''); return /premium/i.test(t) ? 8 : /enhanced|natural|neural/i.test(t) ? 6 : /compact/i.test(t) ? -4 : 0; }; return vs.sort((a, b) => q(b) - q(a))[0] || null; } catch { return null; } }
-function muted(){ try { return !!JSON.parse(localStorage.getItem(`wordraiders.save.${P.id}`) || '{}')?.settings?.mute; } catch { return false; } }
-function say(t){ if (!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); const v = voice(); if (v) u.voice = v; u.rate = .9; speechSynthesis.speak(u); }
+const muted = () => !!voiceBlocked();
+function say(t){ speak(t); }
 
 // ---------- words and their jobs ----------
 const POS = ['noun', 'verb', 'adjective', 'adverb', 'preposition', 'pronoun', 'determiner', 'conjunction'];
@@ -152,7 +152,7 @@ function render(){
 }
 app.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b || b.disabled) return; const a = b.dataset.act;
  if (a === 'start') { startRound(Number(b.dataset.level) || S.level); window.scrollTo(0, 0); return; }
- if (a === 'hear') { if (muted()) flash('Sound is off in WordRaiders settings.'); else say(R.item.sentences.map(s => s.text).join(' ')); return; }
+ if (a === 'hear') { if (muted()) flash(voiceBlocked()); else say(R.item.sentences.map(s => s.text).join(' ')); return; }
  if (!R) return;
  if (a === 'word') setFocus(b.dataset.key);
  else if (a === 'pos') onPos(b.dataset.pos);

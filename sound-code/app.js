@@ -4,6 +4,7 @@
 // words never practised. No timers, no speech recognition: tasks are scored by what the learner taps; reading
 // aloud is self-checked, or scored by a helper with the blueprint's prompt levels.
 import {MODULE_CONTENT as C} from './content.js?v=sc-1';
+import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=1';
 import {UNITS, MODULES, spell, taughtBy} from './inventory.js?v=sc-1';
 import {fresh, modState, buildSession, checkSession, finishSession, probeItems, module0, letterPositions, shuffled, dayKey, addDays} from './engine.js?v=sc-1';
 
@@ -20,10 +21,9 @@ function persist(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch 
 function addXp(n){ if (P.id === 'guest') return; try { const k = `wordraiders.save.${P.id}`, raw = JSON.parse(localStorage.getItem(k) || '{}'); raw.xp = (Number(raw.xp) || 0) + n; raw.savedAt = Date.now(); localStorage.setItem(k, JSON.stringify(raw)); } catch {} }
 const kid = () => S.learner !== 'adult';
 
-// ---------- speech (device voice; honours the app's mute) ----------
-function voice(){ try { const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang)); const q = v => { const t = v.name + ' ' + (v.voiceURI || ''); return /premium/i.test(t) ? 8 : /enhanced|natural|neural/i.test(t) ? 6 : /compact/i.test(t) ? -4 : 0; }; return vs.sort((a, b) => q(b) - q(a))[0] || null; } catch { return null; } }
-function muted(){ try { return !!JSON.parse(localStorage.getItem(`wordraiders.save.${P.id}`) || '{}')?.settings?.mute; } catch { return false; } }
-function say(t, rate){ if (muted()) { flash('Sound is off in WordRaiders settings.'); return; } if (!('speechSynthesis' in window)) { flash('This device has no voice for reading aloud.'); return; } speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); const v = voice(); if (v) u.voice = v; u.rate = rate || (kid() ? .8 : .9); speechSynthesis.speak(u); }
+// ---------- speech: the same voice, speed and volume the player chose in WordRaiders (../wr-voice.js) ----------
+const muted = () => !!voiceBlocked();
+function say(t){ const why = voiceBlocked(); if (why) { flash(why); return; } speak(t); }
 let flashT = 0; function flash(t){ const el = document.querySelector('#status'); if (!el) return; el.textContent = t; clearTimeout(flashT); flashT = setTimeout(() => { el.textContent = ''; }, 3500); }
 const play = (text, label = 'Listen') => `<button class="play" data-act="say" data-text="${esc(text)}" aria-label="${esc(label)}">▶</button>`;
 
