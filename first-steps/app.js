@@ -7,6 +7,7 @@ import {ITEMS} from './items.js?v=fs-1';
 import {NOUNS, VERBS, pic} from './words.js?v=fs-1';
 import {nextItem, shuffled} from '../sentence-decoder/engine.js?v=sd-2';
 import {panel} from '../sentence-decoder/art.js?v=fs-1';
+import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=1';
 
 const app = document.querySelector('#app');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -55,14 +56,12 @@ const POOL = [...WORD_ITEMS, ...ITEMS.map(i => ({ ...i, level: i.stop }))];
 const countAt = n => POOL.filter(i => i.level === n).length;
 
 // ---------- speech: Hear it (honours the app's mute), words light up as they are read ----------
-function voice(){ try { const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang)); const q = v => { const t = v.name + ' ' + (v.voiceURI || ''); return /premium/i.test(t) ? 8 : /enhanced|natural|neural/i.test(t) ? 6 : /compact/i.test(t) ? -4 : 0; }; return vs.sort((a, b) => q(b) - q(a))[0] || null; } catch { return null; } }
-function muted(){ try { return !!JSON.parse(localStorage.getItem(`wordraiders.save.${P.id}`) || '{}')?.settings?.mute; } catch { return false; } }
+const muted = () => !!voiceBlocked();
 let lightT = [];
 function say(text, light){
  lightT.forEach(clearTimeout); lightT = []; document.querySelectorAll('.lit').forEach(e => e.classList.remove('lit'));
- if (muted()) { flash('Sound is off in WordRaiders settings. A grown-up can read it aloud.'); return; }
- if (!('speechSynthesis' in window)) return;
- speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); const v = voice(); if (v) u.voice = v; u.rate = .82;
+ if (muted()) { flash(voiceBlocked() + ' A grown-up can read it aloud.'); return; }
+ const u = { };   // handlers are attached below, then handed to the shared voice
  if (light && light.length) {
   // Light each word as it is read: boundary events when the voice sends them, a steady timer otherwise.
   let got = false; const starts = []; let at = 0; light.forEach(w => { const i = text.indexOf(w.t, at); starts.push(i); at = i + w.t.length; });
@@ -71,7 +70,7 @@ function say(text, light){
   u.onstart = () => { lightT.push(setTimeout(() => { if (!got) light.forEach((_, k) => lightT.push(setTimeout(() => on(k), k * 420))); }, 250)); };
   u.onend = () => setTimeout(() => document.querySelectorAll('.lit').forEach(e => e.classList.remove('lit')), 300);
  }
- speechSynthesis.speak(u);
+ speak(text, { onboundary: u.onboundary, onstart: u.onstart, onend: u.onend });
 }
 let flashT = 0; function flash(t){ const el = document.querySelector('#status'); if (!el) return; el.textContent = t; clearTimeout(flashT); flashT = setTimeout(() => { el.textContent = ''; }, 4000); }
 const hearBtn = (text, label = 'Hear it') => `<button class="hear-btn" data-act="say" data-text="${esc(text)}" aria-label="${esc(label)}">🔊</button>`;
