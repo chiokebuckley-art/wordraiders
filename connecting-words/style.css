@@ -1,0 +1,40 @@
+/* Connecting Words: big, calm, picture-first screens for 7–10 year olds. */
+.readto{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card2);font-size:20px}
+.lead{font-size:20px}.note{margin-top:18px;padding:10px 12px;border-radius:12px;background:#ffc85718;border:1px solid #ffc85755;font-size:15px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.groups{list-style:none;padding:0;margin:0;display:grid;gap:8px}.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:6px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:800;color:var(--muted)}
+.chip.learning{color:var(--ink);border-color:#3f8a4a}.chip.got{color:#13230a;background:var(--lime);border-color:var(--lime)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:16px}
+.prog{height:8px;border-radius:99px;background:var(--card2);overflow:hidden;margin-bottom:10px}.prog span{display:block;height:100%;background:var(--lime)}
+.scene{margin:0 0 10px}.scene img{width:100%;height:auto;border-radius:16px;background:#fff8e9;display:block}
+.sent{font-size:24px;font-weight:800;line-height:1.35;margin:10px 0;display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.sent mark,.meaning mark,.seehow mark{background:var(--gold);color:#1c2b3a;border-radius:6px;padding:0 4px}
+.blank{display:inline-block;min-width:64px;border-bottom:4px solid var(--sky);color:transparent}
+.big-word{font-size:56px;font-weight:900;text-align:center;color:var(--gold);margin:4px 0}
+.meaning{font-size:22px;font-weight:700;text-align:center;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap}
+.pic{display:flex;justify-content:center;margin:8px 0}.pic svg{max-width:100%;height:auto;border-radius:14px}
+.ex{display:flex;gap:12px;align-items:center;margin:10px 0;padding:10px;border-radius:14px;background:#ffffff08}.ex .pic.sm{flex:none;margin:0}
+.ex .sent{font-size:20px;margin:0 0 4px}.seehow{margin:0;font-size:18px;color:#dbe6f2}
+.q{font-size:21px;font-weight:800;margin:6px 0 10px}
+.opts{display:grid;gap:10px}.opts.pics{grid-template-columns:repeat(3,1fr);gap:8px}
+.opt{position:relative;min-height:60px;border-radius:16px;border:3px solid #3a5878;background:#ffffff0f;color:var(--ink);font-size:22px;font-weight:800;padding:10px 14px;text-align:left;display:flex;align-items:center;gap:10px}
+.pic-opt{padding:4px;justify-content:center}.pic-opt svg{width:100%;height:auto;border-radius:10px;display:block}
+.opt .tag{min-width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:16px;background:var(--card2);flex:none}
+.pic-opt .tag{position:absolute;top:-8px;left:-8px}
+.opt.right{border-color:#46c46a;background:#46c46a26}.opt.right .tag{background:#46c46a;color:#08210f}
+.opt.wrong{border-color:#ff9f43;background:#ff9f431f}.opt.wrong .tag{background:#ff9f43;color:#2a1600}
+.opt:disabled{opacity:1;cursor:default}
+.fb{margin:12px 0;padding:12px;border-radius:14px;font-size:19px;font-weight:700}.fb.ok{background:#46c46a22;border:1px solid #46c46a77}.fb.try{background:#ff9f4318;border:1px solid #ff9f4366}
+.wrap{margin:8px 0 4px;padding:12px;border-radius:14px;background:#bfff7322;border:2px solid var(--lime);font-size:19px;font-weight:700}
+.hear-btn{flex:none;width:44px;height:44px;border-radius:12px;border:0;background:#1c2b3a;color:#fff;font-size:19px}
+.result{text-align:center}.result .row{justify-content:center}.burst{font-size:56px}
+.tog{display:flex;gap:10px;align-items:center;min-height:44px;font-weight:700}.tog input{width:22px;height:22px}
+@media (max-width:420px){.sent{font-size:21px}.opt{font-size:20px}.big-word{font-size:46px}}
+/* Pictures must be big enough to read on a phone: one picture choice per row, examples stacked. */
+.opts.pics{grid-template-columns:1fr;gap:12px}.pic-opt svg{width:100%;max-width:300px;margin:0 auto}
+.pic-opt .tag{top:8px;left:8px;width:34px;height:34px;font-size:18px}
+.ex{flex-direction:column;align-items:stretch}.ex .pic.sm svg{width:100%;max-width:300px;margin:0 auto;display:block}
+@media (min-width:700px){.opts.pics{grid-template-columns:repeat(3,1fr)}}
+/* Let sentences flow as normal text (a flex row split the highlighted word onto its own line). */
+.sent,.meaning{display:block}.sent .hear-btn,.meaning .hear-btn{display:inline-grid;place-items:center;vertical-align:middle;margin-left:6px}
