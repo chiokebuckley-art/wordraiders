@@ -1445,7 +1445,7 @@ export function stripGeometry(joined=true){
 export function equalLengthGeometry(){return [{x:24,y:30,width:360,height:24},{x:24,y:100,width:360,height:24}];}
 export function sceneContextView(sense,el,button){
  const context=contextForSense(sense);if(!context)return null;
- const panel=el('section',undefined,'cl-context');panel.dataset.senseId=sense.id;panel.dataset.contentVersion=String(sense.content_version);panel.append(el('h3',context.title),el('p',aiReviewComplete(context,'context')?'AI-reviewed editable story scene.':'Draft example scene · educational review pending.'));
+ const panel=el('section',undefined,'cl-context');panel.dataset.senseId=sense.id;panel.dataset.contentVersion=String(sense.content_version);panel.append(el('h3',context.title));
  const facts=el('dl');for(const [label,text]of context.facts)facts.append(el('dt',label),el('dd',text));panel.append(facts);
  const doc=panel.ownerDocument,svgNode=(tag,attrs={})=>{const n=doc.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
  if(context.kind==='strip-ratio'||context.kind==='equal-length'){
