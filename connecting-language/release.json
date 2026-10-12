@@ -1,0 +1,11 @@
+{
+  "source_repository": "chiokebuckley-art/command-center",
+  "source_commit": "8abc761",
+  "source_branch": "connecting-language-reviewed-release",
+  "scope": "Connecting Language module and generated hub assets; existing standalone games and sync configuration preserved",
+  "review_policy": "ai-independent-v1",
+  "senses": 248,
+  "guided_tasks": 1532,
+  "assessment_tasks": 1736,
+  "main_scene_bindings": 248
+}

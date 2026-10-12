@@ -1,0 +1,712 @@
+{
+  "CD-0030": {
+    "status": "owner_wording_corrected_draft",
+    "note": "The owner approved the version2 wording correction. Original findings and PDF wording are preserved in provenance. Guided practice remains a draft; educational review, media review and publication are pending.",
+    "findings": [
+      {
+        "finding_id": "CL-01",
+        "record_ids": [
+          "CD-0030"
+        ],
+        "kind": "example_clarity",
+        "issue": "The rain/indoor-play example is weak standalone evidence of contrast; it can look like a straightforward result.",
+        "recommended_action": "Editor should add expectation context or approve a clearer contrast, for example: It rained. However, we still played outside. Preserve the original until approved.",
+        "auto_apply": false
+      }
+    ],
+    "source_block_resolved": true,
+    "content_version": 2,
+    "example": "The rain seemed likely to stop our game. However, we played indoors.",
+    "meaning": "Signals contrast with an earlier statement.",
+    "original_source_example": "It rained. However, we played indoors.",
+    "wording_approval": {
+      "status": "owner_approved_wording_only",
+      "approved_at": "2026-10-12T04:58:02.848367+00:00",
+      "evidence": "Parent supplied transcript: assistant proposed the three exact examples; user replied Sure.",
+      "scope": "Only these three wording corrections. Not educator endorsement, asset approval, publication approval or persistent response permission.",
+      "educator_approval": false,
+      "publication_approved": false,
+      "asset_approved": false
+    },
+    "educator_approval": false
+  },
+  "CD-0045": {
+    "status": "recommendation_only",
+    "note": "The speed versus travel-time relationship assumes a fixed journey distance. Keep the route and distance identical across both comparisons; make that condition visible. ",
+    "findings": [
+      {
+        "finding_id": "CL-02",
+        "record_ids": [
+          "CD-0045"
+        ],
+        "kind": "scene_assumption",
+        "issue": "The speed versus travel-time relationship assumes a fixed journey distance.",
+        "recommended_action": "Keep the route and distance identical across both comparisons; make that condition visible.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0086": {
+    "status": "recommendation_only",
+    "note": "The example We will go whether it is sunny or cloudy expresses going regardless of which alternative holds, while the definition is broader. Editor should align this sense definition to regardless of which alternative is true. Both weather branches should retain the going outcome. ",
+    "findings": [
+      {
+        "finding_id": "CL-03",
+        "record_ids": [
+          "CD-0086"
+        ],
+        "kind": "sense_example_alignment",
+        "issue": "The example We will go whether it is sunny or cloudy expresses going regardless of which alternative holds, while the definition is broader.",
+        "recommended_action": "Editor should align this sense definition to regardless of which alternative is true. Both weather branches should retain the going outcome.",
+        "auto_apply": false,
+        "reference_url": "https://dictionary.cambridge.org/grammar/british-grammar/whether"
+      }
+    ]
+  },
+  "CD-0131": {
+    "status": "owner_wording_corrected_draft",
+    "note": "The owner approved the version2 wording correction. Original findings and PDF wording are preserved in provenance. Guided practice remains a draft; educational review, media review and publication are pending.",
+    "findings": [
+      {
+        "finding_id": "CL-04",
+        "record_ids": [
+          "CD-0131"
+        ],
+        "kind": "example_equivalence",
+        "issue": "It is twice as long does not necessarily mean its length has doubled; the first can compare different objects and the second compares an object with its earlier state.",
+        "recommended_action": "Make the before/after referent explicit, or have an editor approve It is twice as long as before. Do not draw two unrelated ropes and call that doubling.",
+        "auto_apply": false
+      }
+    ],
+    "source_block_resolved": true,
+    "content_version": 2,
+    "example": "This strip is twice as long as that strip. To put it another way, two copies of that strip, placed end to end, would match this strip.",
+    "meaning": "Introduces a different wording of the same idea.",
+    "original_source_example": "It is twice as long. To put it another way, its length has doubled.",
+    "wording_approval": {
+      "status": "owner_approved_wording_only",
+      "approved_at": "2026-10-12T04:58:02.848367+00:00",
+      "evidence": "Parent supplied transcript: assistant proposed the three exact examples; user replied Sure.",
+      "scope": "Only these three wording corrections. Not educator endorsement, asset approval, publication approval or persistent response permission.",
+      "educator_approval": false,
+      "publication_approved": false,
+      "asset_approved": false
+    },
+    "educator_approval": false
+  },
+  "CD-0160": {
+    "status": "owner_wording_corrected_draft",
+    "note": "The owner approved the version2 wording correction. Original findings and PDF wording are preserved in provenance. Guided practice remains a draft; educational review, media review and publication are pending.",
+    "findings": [
+      {
+        "finding_id": "CL-05",
+        "record_ids": [
+          "CD-0160"
+        ],
+        "kind": "transcript_punctuation",
+        "issue": "The spoken example joins independent clauses using commas around you see, which needs review before reuse as a written literacy model.",
+        "recommended_action": "Have an editor approve transcript punctuation; a possible revision is We cannot leave yet. You see, the door is locked. Spoken intonation must also be reviewed.",
+        "auto_apply": false
+      }
+    ],
+    "source_block_resolved": true,
+    "content_version": 2,
+    "example": "We cannot leave yet. You see, the door is locked.",
+    "meaning": "Introduces an explanation.",
+    "original_source_example": "We cannot leave yet, you see, the door is locked.",
+    "wording_approval": {
+      "status": "owner_approved_wording_only",
+      "approved_at": "2026-10-12T04:58:02.848367+00:00",
+      "evidence": "Parent supplied transcript: assistant proposed the three exact examples; user replied Sure.",
+      "scope": "Only these three wording corrections. Not educator endorsement, asset approval, publication approval or persistent response permission.",
+      "educator_approval": false,
+      "publication_approved": false,
+      "asset_approved": false
+    },
+    "educator_approval": false
+  },
+  "CD-0218": {
+    "status": "recommendation_only",
+    "note": "This refers to the event of missing the bus, not only to the bus object. Point the reference cue at the entire missed-bus event panel. ",
+    "findings": [
+      {
+        "finding_id": "CL-06",
+        "record_ids": [
+          "CD-0218"
+        ],
+        "kind": "reference_scope",
+        "issue": "This refers to the event of missing the bus, not only to the bus object.",
+        "recommended_action": "Point the reference cue at the entire missed-bus event panel.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0216": {
+    "status": "recommendation_only",
+    "note": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl. Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object. ",
+    "findings": [
+      {
+        "finding_id": "CL-07",
+        "record_ids": [
+          "CD-0216",
+          "CD-0224",
+          "CD-0225",
+          "CD-0226",
+          "CD-0227",
+          "CD-0228",
+          "CD-0232"
+        ],
+        "kind": "identity_vs_substitution",
+        "issue": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl.",
+        "recommended_action": "Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0224": {
+    "status": "recommendation_only",
+    "note": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl. Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object. ",
+    "findings": [
+      {
+        "finding_id": "CL-07",
+        "record_ids": [
+          "CD-0216",
+          "CD-0224",
+          "CD-0225",
+          "CD-0226",
+          "CD-0227",
+          "CD-0228",
+          "CD-0232"
+        ],
+        "kind": "identity_vs_substitution",
+        "issue": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl.",
+        "recommended_action": "Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0225": {
+    "status": "recommendation_only",
+    "note": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl. Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object. ",
+    "findings": [
+      {
+        "finding_id": "CL-07",
+        "record_ids": [
+          "CD-0216",
+          "CD-0224",
+          "CD-0225",
+          "CD-0226",
+          "CD-0227",
+          "CD-0228",
+          "CD-0232"
+        ],
+        "kind": "identity_vs_substitution",
+        "issue": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl.",
+        "recommended_action": "Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0226": {
+    "status": "recommendation_only",
+    "note": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl. Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object. ",
+    "findings": [
+      {
+        "finding_id": "CL-07",
+        "record_ids": [
+          "CD-0216",
+          "CD-0224",
+          "CD-0225",
+          "CD-0226",
+          "CD-0227",
+          "CD-0228",
+          "CD-0232"
+        ],
+        "kind": "identity_vs_substitution",
+        "issue": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl.",
+        "recommended_action": "Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0227": {
+    "status": "recommendation_only",
+    "note": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl. Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object. ",
+    "findings": [
+      {
+        "finding_id": "CL-07",
+        "record_ids": [
+          "CD-0216",
+          "CD-0224",
+          "CD-0225",
+          "CD-0226",
+          "CD-0227",
+          "CD-0228",
+          "CD-0232"
+        ],
+        "kind": "identity_vs_substitution",
+        "issue": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl.",
+        "recommended_action": "Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0228": {
+    "status": "recommendation_only",
+    "note": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl. Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object. ",
+    "findings": [
+      {
+        "finding_id": "CL-07",
+        "record_ids": [
+          "CD-0216",
+          "CD-0224",
+          "CD-0225",
+          "CD-0226",
+          "CD-0227",
+          "CD-0228",
+          "CD-0232"
+        ],
+        "kind": "identity_vs_substitution",
+        "issue": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl.",
+        "recommended_action": "Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0232": {
+    "status": "recommendation_only",
+    "note": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl. Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object. ",
+    "findings": [
+      {
+        "finding_id": "CL-07",
+        "record_ids": [
+          "CD-0216",
+          "CD-0224",
+          "CD-0225",
+          "CD-0226",
+          "CD-0227",
+          "CD-0228",
+          "CD-0232"
+        ],
+        "kind": "identity_vs_substitution",
+        "issue": "The shared category rig risks treating every substitution as identity. It refers to the same key; one may refer to another pen; the same can mean the same soup choice, not one shared bowl.",
+        "recommended_action": "Use identity arrows only where appropriate. Model noun, action and proposition replacement with the relevant phrase slots and distinguish same type from same object.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0001": {
+    "status": "recommendation_only",
+    "note": "The PDF storyboard illustrations use generic A-to-B arrows for addition and choice as well as cause and time. Copying those diagrams literally can imply an unintended direction or cause. Design inclusion and alternatives using grouped or selectable items. Retain the exact taught relation instead of copying the generic arrow template. ",
+    "findings": [
+      {
+        "finding_id": "CL-08",
+        "record_ids": [
+          "CD-0001",
+          "CD-0016",
+          "CD-0233",
+          "CD-0234"
+        ],
+        "kind": "template_semantics",
+        "issue": "The PDF storyboard illustrations use generic A-to-B arrows for addition and choice as well as cause and time. Copying those diagrams literally can imply an unintended direction or cause.",
+        "recommended_action": "Design inclusion and alternatives using grouped or selectable items. Retain the exact taught relation instead of copying the generic arrow template.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0016": {
+    "status": "recommendation_only",
+    "note": "The PDF storyboard illustrations use generic A-to-B arrows for addition and choice as well as cause and time. Copying those diagrams literally can imply an unintended direction or cause. Design inclusion and alternatives using grouped or selectable items. Retain the exact taught relation instead of copying the generic arrow template. ",
+    "findings": [
+      {
+        "finding_id": "CL-08",
+        "record_ids": [
+          "CD-0001",
+          "CD-0016",
+          "CD-0233",
+          "CD-0234"
+        ],
+        "kind": "template_semantics",
+        "issue": "The PDF storyboard illustrations use generic A-to-B arrows for addition and choice as well as cause and time. Copying those diagrams literally can imply an unintended direction or cause.",
+        "recommended_action": "Design inclusion and alternatives using grouped or selectable items. Retain the exact taught relation instead of copying the generic arrow template.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0233": {
+    "status": "recommendation_only",
+    "note": "The PDF storyboard illustrations use generic A-to-B arrows for addition and choice as well as cause and time. Copying those diagrams literally can imply an unintended direction or cause. Design inclusion and alternatives using grouped or selectable items. Retain the exact taught relation instead of copying the generic arrow template. ",
+    "findings": [
+      {
+        "finding_id": "CL-08",
+        "record_ids": [
+          "CD-0001",
+          "CD-0016",
+          "CD-0233",
+          "CD-0234"
+        ],
+        "kind": "template_semantics",
+        "issue": "The PDF storyboard illustrations use generic A-to-B arrows for addition and choice as well as cause and time. Copying those diagrams literally can imply an unintended direction or cause.",
+        "recommended_action": "Design inclusion and alternatives using grouped or selectable items. Retain the exact taught relation instead of copying the generic arrow template.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0234": {
+    "status": "recommendation_only",
+    "note": "The PDF storyboard illustrations use generic A-to-B arrows for addition and choice as well as cause and time. Copying those diagrams literally can imply an unintended direction or cause. Design inclusion and alternatives using grouped or selectable items. Retain the exact taught relation instead of copying the generic arrow template. ",
+    "findings": [
+      {
+        "finding_id": "CL-08",
+        "record_ids": [
+          "CD-0001",
+          "CD-0016",
+          "CD-0233",
+          "CD-0234"
+        ],
+        "kind": "template_semantics",
+        "issue": "The PDF storyboard illustrations use generic A-to-B arrows for addition and choice as well as cause and time. Copying those diagrams literally can imply an unintended direction or cause.",
+        "recommended_action": "Design inclusion and alternatives using grouped or selectable items. Retain the exact taught relation instead of copying the generic arrow template.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0076": {
+    "status": "recommendation_only",
+    "note": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero. Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one. ",
+    "findings": [
+      {
+        "finding_id": "CL-09",
+        "record_ids": [
+          "CD-0076",
+          "CD-0082",
+          "CD-0237",
+          "CD-0238",
+          "CD-0241",
+          "CD-0244",
+          "CD-0246"
+        ],
+        "kind": "semantic_guardrail",
+        "issue": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero.",
+        "recommended_action": "Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0082": {
+    "status": "recommendation_only",
+    "note": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero. Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one. ",
+    "findings": [
+      {
+        "finding_id": "CL-09",
+        "record_ids": [
+          "CD-0076",
+          "CD-0082",
+          "CD-0237",
+          "CD-0238",
+          "CD-0241",
+          "CD-0244",
+          "CD-0246"
+        ],
+        "kind": "semantic_guardrail",
+        "issue": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero.",
+        "recommended_action": "Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0237": {
+    "status": "recommendation_only",
+    "note": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero. Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one. ",
+    "findings": [
+      {
+        "finding_id": "CL-09",
+        "record_ids": [
+          "CD-0076",
+          "CD-0082",
+          "CD-0237",
+          "CD-0238",
+          "CD-0241",
+          "CD-0244",
+          "CD-0246"
+        ],
+        "kind": "semantic_guardrail",
+        "issue": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero.",
+        "recommended_action": "Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0238": {
+    "status": "recommendation_only",
+    "note": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero. Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one. ",
+    "findings": [
+      {
+        "finding_id": "CL-09",
+        "record_ids": [
+          "CD-0076",
+          "CD-0082",
+          "CD-0237",
+          "CD-0238",
+          "CD-0241",
+          "CD-0244",
+          "CD-0246"
+        ],
+        "kind": "semantic_guardrail",
+        "issue": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero.",
+        "recommended_action": "Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0241": {
+    "status": "recommendation_only",
+    "note": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero. Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one. ",
+    "findings": [
+      {
+        "finding_id": "CL-09",
+        "record_ids": [
+          "CD-0076",
+          "CD-0082",
+          "CD-0237",
+          "CD-0238",
+          "CD-0241",
+          "CD-0244",
+          "CD-0246"
+        ],
+        "kind": "semantic_guardrail",
+        "issue": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero.",
+        "recommended_action": "Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0244": {
+    "status": "recommendation_only",
+    "note": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero. Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one. ",
+    "findings": [
+      {
+        "finding_id": "CL-09",
+        "record_ids": [
+          "CD-0076",
+          "CD-0082",
+          "CD-0237",
+          "CD-0238",
+          "CD-0241",
+          "CD-0244",
+          "CD-0246"
+        ],
+        "kind": "semantic_guardrail",
+        "issue": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero.",
+        "recommended_action": "Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0246": {
+    "status": "recommendation_only",
+    "note": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero. Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one. ",
+    "findings": [
+      {
+        "finding_id": "CL-09",
+        "record_ids": [
+          "CD-0076",
+          "CD-0082",
+          "CD-0237",
+          "CD-0238",
+          "CD-0241",
+          "CD-0244",
+          "CD-0246"
+        ],
+        "kind": "semantic_guardrail",
+        "issue": "The PDF specifically requires distinction between necessary and sufficient conditions, precaution and condition, implication and biconditional, some and not-all/none, and at-most-one including zero.",
+        "recommended_action": "Add explicit contrast tests and reviewed scenes. Do not make only-if automatically bidirectional, in-case wait for rain, some mean not-all, or at-most-one require exactly one.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0174": {
+    "status": "recommendation_only",
+    "note": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through. Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity. ",
+    "findings": [
+      {
+        "finding_id": "CL-10",
+        "record_ids": [
+          "CD-0174",
+          "CD-0198",
+          "CD-0175",
+          "CD-0200",
+          "CD-0202",
+          "CD-0205",
+          "CD-0195",
+          "CD-0215"
+        ],
+        "kind": "state_motion_and_sense",
+        "issue": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through.",
+        "recommended_action": "Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0198": {
+    "status": "recommendation_only",
+    "note": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through. Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity. ",
+    "findings": [
+      {
+        "finding_id": "CL-10",
+        "record_ids": [
+          "CD-0174",
+          "CD-0198",
+          "CD-0175",
+          "CD-0200",
+          "CD-0202",
+          "CD-0205",
+          "CD-0195",
+          "CD-0215"
+        ],
+        "kind": "state_motion_and_sense",
+        "issue": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through.",
+        "recommended_action": "Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0175": {
+    "status": "recommendation_only",
+    "note": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through. Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity. ",
+    "findings": [
+      {
+        "finding_id": "CL-10",
+        "record_ids": [
+          "CD-0174",
+          "CD-0198",
+          "CD-0175",
+          "CD-0200",
+          "CD-0202",
+          "CD-0205",
+          "CD-0195",
+          "CD-0215"
+        ],
+        "kind": "state_motion_and_sense",
+        "issue": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through.",
+        "recommended_action": "Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0200": {
+    "status": "recommendation_only",
+    "note": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through. Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity. ",
+    "findings": [
+      {
+        "finding_id": "CL-10",
+        "record_ids": [
+          "CD-0174",
+          "CD-0198",
+          "CD-0175",
+          "CD-0200",
+          "CD-0202",
+          "CD-0205",
+          "CD-0195",
+          "CD-0215"
+        ],
+        "kind": "state_motion_and_sense",
+        "issue": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through.",
+        "recommended_action": "Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0202": {
+    "status": "recommendation_only",
+    "note": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through. Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity. ",
+    "findings": [
+      {
+        "finding_id": "CL-10",
+        "record_ids": [
+          "CD-0174",
+          "CD-0198",
+          "CD-0175",
+          "CD-0200",
+          "CD-0202",
+          "CD-0205",
+          "CD-0195",
+          "CD-0215"
+        ],
+        "kind": "state_motion_and_sense",
+        "issue": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through.",
+        "recommended_action": "Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0205": {
+    "status": "recommendation_only",
+    "note": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through. Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity. ",
+    "findings": [
+      {
+        "finding_id": "CL-10",
+        "record_ids": [
+          "CD-0174",
+          "CD-0198",
+          "CD-0175",
+          "CD-0200",
+          "CD-0202",
+          "CD-0205",
+          "CD-0195",
+          "CD-0215"
+        ],
+        "kind": "state_motion_and_sense",
+        "issue": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through.",
+        "recommended_action": "Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0195": {
+    "status": "recommendation_only",
+    "note": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through. Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity. ",
+    "findings": [
+      {
+        "finding_id": "CL-10",
+        "record_ids": [
+          "CD-0174",
+          "CD-0198",
+          "CD-0175",
+          "CD-0200",
+          "CD-0202",
+          "CD-0205",
+          "CD-0195",
+          "CD-0215"
+        ],
+        "kind": "state_motion_and_sense",
+        "issue": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through.",
+        "recommended_action": "Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity.",
+        "auto_apply": false
+      }
+    ]
+  },
+  "CD-0215": {
+    "status": "recommendation_only",
+    "note": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through. Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity. ",
+    "findings": [
+      {
+        "finding_id": "CL-10",
+        "record_ids": [
+          "CD-0174",
+          "CD-0198",
+          "CD-0175",
+          "CD-0200",
+          "CD-0202",
+          "CD-0205",
+          "CD-0195",
+          "CD-0215"
+        ],
+        "kind": "state_motion_and_sense",
+        "issue": "Related spellings and scenes must preserve position versus motion, direction versus arrival, and concrete through versus abstract through.",
+        "recommended_action": "Use persistent viewpoints and start/end states; toward does not guarantee arrival. Do not deduplicate records by term spelling or asset similarity.",
+        "auto_apply": false
+      }
+    ]
+  }
+}

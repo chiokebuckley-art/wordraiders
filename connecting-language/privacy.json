@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "persistent_free_text": false,
+  "approval_status": "owner-review-pending",
+  "reviewer": null,
+  "reviewed_at": null,
+  "scope": "Optional device-local explanations, open responses, spoken-response markers and unverified human worksheets. No cloud, analytics or external AI transmission.",
+  "release_requirement": "The owner must explicitly approve this new persistent free-text behavior before enabling it for learners. Until then, new text stays in the current tab and is not written to storage. Existing legacy private fields remain untouched by ordinary participation saves."
+}

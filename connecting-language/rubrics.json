@@ -1,0 +1,51 @@
+{
+  "id": "grammar-relation-fluency-v1",
+  "version": 1,
+  "publication_status": "draft_unpublished",
+  "review_status": "draft",
+  "reviewer": null,
+  "reviewed_at": null,
+  "purpose": "Separate human feedback on an optional written or directly spoken response. These local worksheets do not authenticate an educator, approve curriculum or award mastery.",
+  "ratings": [
+    "not-reviewed",
+    "needs-work",
+    "developing",
+    "clear"
+  ],
+  "dimensions": [
+    {
+      "id": "grammar",
+      "label": "Grammar and construction",
+      "question": "Does the response use a grammatical construction for the intended sense, with appropriate clause/noun-phrase surroundings and punctuation? Accept grammatical alternative wording; do not demand the PDF wording.",
+      "anchors": {
+        "not-reviewed": "No judgment recorded.",
+        "needs-work": "A construction or punctuation issue obscures the intended relation.",
+        "developing": "The relation is understandable, but a construction or punctuation point needs discussion.",
+        "clear": "The construction supports the intended sense in this context."
+      }
+    },
+    {
+      "id": "relation",
+      "label": "Meaning and relationship",
+      "question": "Does the response express this particular sense? Identify referents, condition direction, expectation, time reference, route/distance assumptions, or the fixed logical domain as relevant. Do not equate a word class, discourse function and truth condition.",
+      "anchors": {
+        "not-reviewed": "No judgment recorded.",
+        "needs-work": "The relation differs from the intended sense, or a necessary referent/assumption is missing.",
+        "developing": "The intended relation is plausible, but context or referents need clarification.",
+        "clear": "The intended relation and necessary context are explicit and coherent."
+      }
+    },
+    {
+      "id": "fluency",
+      "label": "Understandable use in context",
+      "question": "Can a listener or reader follow the response in its intended setting and register? Accept dialect and age-appropriate variation. Do not penalize accent, hesitation or a planning pause, or treat speed as proficiency.",
+      "anchors": {
+        "not-reviewed": "No judgment recorded.",
+        "needs-work": "The intended message cannot yet be followed without substantial clarification.",
+        "developing": "The message can be followed with some clarification.",
+        "clear": "The message is understandable and suited to the stated context."
+      }
+    }
+  ],
+  "decision": "Record separate ratings and descriptive feedback. No aggregate score, certification, automatic approval or learner proficiency claim. Flagged source examples must be resolved by the content editor before an assessment key can be published."
+}
