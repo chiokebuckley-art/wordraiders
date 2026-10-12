@@ -1,8 +1,10 @@
 {
   "source_repository": "chiokebuckley-art/command-center",
-  "source_commit": "8abc761",
-  "source_branch": "connecting-language-reviewed-release",
-  "scope": "Connecting Language module and generated hub assets; existing standalone games and sync configuration preserved",
+  "source_commit": "012b1c87b637d72be59158b8c19686dbdb6ce0ff",
+  "reviewed_head": "2db4f026adf52622c9ec5623832ea2c046d6d10c",
+  "source_branch": "main",
+  "scope": "Focused Connecting Language UI only; existing hub assets, standalone games, curriculum, scoring and sync preserved",
+  "ui_revision": "focused-one-question-v1",
   "review_policy": "ai-independent-v1",
   "senses": 248,
   "guided_tasks": 1532,
