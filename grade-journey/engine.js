@@ -55,12 +55,14 @@ export function refreshUnits(S, g, UNITS){
 export function currentUnit(S, g, UNITS){ refreshUnits(S, g, UNITS); return UNITS.find(u => !u.optional && !['passed', 'tested-out'].includes(unitRec(S, g, u.id).status)) || null; }
 /** Passages for a unit: listening units use their first 2 passages as practice and the rest as checks. */
 export function poolOf(PASSAGES, u, kind){
+ if (u.mode === 'book') return PASSAGES.filter(p => p.unit === u.id && p.pool === 'book').sort((a, b) => a.chapter - b.chapter);
  if (isListen(u)) { const ls = PASSAGES.filter(p => p.unit === u.id && p.pool === 'listening').sort((a, b) => a.id.localeCompare(b.id)); return kind === 'practice' ? ls.slice(0, 2) : ls.slice(2); }
  return PASSAGES.filter(p => p.unit === u.id && p.pool === kind);
 }
 /** What to read next in a unit: practice until it is passed, then an unseen check (one check pass a day). */
 export function nextPassage(S, g, u, PASSAGES, today){
  const r = unitRec(S, g, u.id), vis = p => !S.hidden[p.id];
+ if (u.mode === 'book') { const ch = poolOf(PASSAGES, u).find(p => !(r.chapters || {})[p.chapter]); return ch ? { p: ch, kind: 'book' } : { kind: 'empty' }; }
  if (!r.practiceDone) { const ps = poolOf(PASSAGES, u, 'practice').filter(vis); if (!ps.length) return null; const sorted = ps.slice().sort((a, b) => (S.seen[a.id] || '').localeCompare(S.seen[b.id] || '') || a.id.localeCompare(b.id)); return { p: sorted[0], kind: 'practice' }; }
  if (r.passedDays.includes(today)) return { kind: 'wait' };
  const unseen = poolOf(PASSAGES, u, 'check').filter(p => vis(p) && !S.seen[p.id]);
@@ -77,6 +79,12 @@ export function recordPassage(S, g, u, p, kind, answers, { ttsUsed, seenBefore }
   r.practice.push({ at: day, pid: p.id, pct, tts: !!ttsUsed });
   const last = r.practice.slice(-2);
   if (!r.practiceDone && last.length === 2 && last.every(x => x.pct >= PASS)) { r.practiceDone = true; out.practiceDone = true; }
+ } else if (kind === 'book') {
+  r.chapters ||= {}; r.chapters[p.chapter] = { at: day, pid: p.id, pct, tts: !!ttsUsed };
+  if (Object.keys(r.chapters).length >= 2) r.practiceDone = true;
+  const chs = Object.values(r.chapters);
+  if (chs.length >= 4 && r.status !== 'passed') { r.status = 'passed'; r.passedAt = day; out.unitPassed = true; gradeRec(S, g).gate.book = { at: day, title: p.book, pct: +(chs.reduce((a, c) => a + c.pct, 0) / chs.length).toFixed(2) }; }
+  if (!ttsUsed && !seenBefore && pct >= PASS) gradeRec(S, g).gate.unseenComprehension.push({ at: day, pid: p.id, pct });
  } else if (kind === 'check' || kind === 'challenge') {
   // Listening checks are read aloud on purpose; reading checks only count with read-aloud off and on a new text.
   const counts = !seenBefore && pct >= PASS && (isListen(u) || !ttsUsed);
@@ -108,40 +116,33 @@ export function recordOral(S, g, p, { wordsRead, errors, seconds, scoredBy = 'pa
 
 // ---------- the grade gate + certificate ----------
 export function soundCodeThrough(sc, n){ const mods = sc?.mods || {}; const out = []; for (let k = 1; k <= n; k++) { const st = mods[k]?.state; out.push({ n: k, ok: st === 'mastered' || st === 'keep', state: st || null, placedOut: !!mods[k]?.placedOut }); } return out; }
-export function gateStatus(S, g, UNITS, sc){
- const G = gradeRec(S, g), req = UNITS.filter(u => !u.optional);
+export function gateStatus(S, G, sc){
+ const g = G.grade, R = gradeRec(S, g), req = G.units.filter(u => !u.optional);
  const units = req.map(u => ({ id: u.id, title: u.title, status: unitRec(S, g, u.id).status }));
- const sound = soundCodeThrough(sc, 7);
- const oral = G.gate.oral.filter(o => o.counts);
- const compDays = [...new Set(G.gate.unseenComprehension.map(c => c.at))];
- const parts = {
-  units: { ok: units.every(u => u.status === 'passed' || u.status === 'tested-out'), done: units.filter(u => u.status === 'passed' || u.status === 'tested-out').length, of: units.length },
-  soundCode: { ok: sound.every(x => x.ok), done: sound.filter(x => x.ok).length, of: sound.length },
-  oral: { ok: oral.length >= 2, done: Math.min(2, oral.length), of: 2 },
-  comprehension: { ok: compDays.length >= 2, done: Math.min(2, compDays.length), of: 2 },
- };
+ const sound = G.gate.soundCode ? soundCodeThrough(sc, G.gate.soundCode) : [];
+ const oral = R.gate.oral.filter(o => o.counts), compDays = [...new Set(R.gate.unseenComprehension.map(c => c.at))];
+ const parts = { units: { ok: units.every(u => u.status === 'passed' || u.status === 'tested-out'), done: units.filter(u => u.status === 'passed' || u.status === 'tested-out').length, of: units.length },
+  comprehension: { ok: compDays.length >= 2, done: Math.min(2, compDays.length), of: 2 } };
+ if (G.gate.soundCode) parts.soundCode = { ok: sound.every(x => x.ok), done: sound.filter(x => x.ok).length, of: sound.length, through: G.gate.soundCode };
+ if (G.gate.oral) parts.oral = { ok: oral.length >= G.gate.oral, done: Math.min(G.gate.oral, oral.length), of: G.gate.oral };
+ if (G.gate.book) { const bu = G.units.find(u => u.mode === 'book'), st = bu && unitRec(S, g, bu.id).status; parts.book = { ok: !!R.gate.book || st === 'tested-out', done: R.gate.book || st === 'tested-out' ? 1 : 0, of: 1 }; }
  return { parts, met: Object.values(parts).every(p => p.ok), sound, units };
 }
-export function issueCertificate(S, g, UNITS, sc, now = Date.now()){
- const st = gateStatus(S, g, UNITS, sc), G = gradeRec(S, g); if (!st.met || G.certificate) return G.certificate;
- const comp = G.gate.unseenComprehension, oral = G.gate.oral.filter(o => o.counts), wr = G.optionalWriting.slice(-1)[0];
- G.certificate = { at: dayKey(now), grade: g, passages: comp.length, compPct: Math.round(comp.reduce((a, c) => a + c.pct, 0) / Math.max(1, comp.length) * 100), oralAcc: Math.round(Math.max(...oral.map(o => o.accuracy)) * 100), writing: wr ? `${wr.score}/${wr.of}` : null };
- G.status = 'complete';
- return G.certificate;
+export function issueCertificate(S, G, sc, now = Date.now()){
+ const g = G.grade, st = gateStatus(S, G, sc), R = gradeRec(S, g); if (!st.met || R.certificate) return R.certificate;
+ const comp = R.gate.unseenComprehension, oral = R.gate.oral.filter(o => o.counts), wr = R.optionalWriting.filter(w => w.score != null).slice(-1)[0];
+ R.certificate = { at: dayKey(now), grade: g, passages: comp.length, compPct: Math.round(comp.reduce((a, c) => a + c.pct, 0) / Math.max(1, comp.length) * 100), oralAcc: oral.length ? Math.round(Math.max(...oral.map(o => o.accuracy)) * 100) : null, book: R.gate.book?.title || null, soundCode: G.gate.soundCode || null, writing: wr ? `${wr.score}/${wr.of}` : null };
+ R.status = 'complete';
+ return R.certificate;
 }
+/** After a certificate: move up a grade (logged). */
+export function moveUp(S, now = Date.now()){ const g = S.placedGrade || 1; if (g >= 12 || !gradeRec(S, g).certificate) return false; setGrade(S, g + 1, { by: 'gate', why: `Grade ${g} certificate`, placedBy: 'gate' }, now); return true; }
 
 // ---------- tracks (decoding vs comprehension vs listening) ----------
-export function tracks(S, g, UNITS, sc){
- const G = gradeRec(S, g), units = UNITS.filter(u => !u.optional && !isListen(u));
+export function tracks(S, G, sc){
+ const g = G.grade, R = gradeRec(S, g), units = G.units.filter(u => !u.optional && u.mode === 'reading');
  const lastPassed = [...units].reverse().find(u => ['passed', 'tested-out'].includes(unitRec(S, g, u.id).status));
- const lis = UNITS.find(isListen), lisRec = lis && unitRec(S, g, lis.id);
  const recentListen = S.events.filter(e => e.track === 'listening').slice(-12), recentRead = S.events.filter(e => e.track === 'comprehension' && !e.ttsUsed).slice(-12);
  const pct = es => es.length ? es.filter(e => e.correct && e.firstTry).length / es.length : null;
- return {
-  decoding: sc?.placed ? `Sound Code module ${sc.module ?? 0}` : 'Sound Code not started',
-  comprehension: lastPassed ? `${lastPassed.id} passed` : 'starting Grade 1',
-  listening: lisRec?.status === 'passed' ? 'Grade 1 listening passed' : 'in progress',
-  listenPct: pct(recentListen), readPct: pct(recentRead),
-  oralLast: G.gate.oral.slice(-1)[0] || null,
- };
+ return { decoding: sc?.placed ? `Sound Code module ${sc.module ?? 0}` : 'Sound Code not started', comprehension: lastPassed ? `${lastPassed.id} passed` : `starting Grade ${g}`, listenPct: pct(recentListen), readPct: pct(recentRead), oralLast: R.gate.oral.slice(-1)[0] || null };
 }
