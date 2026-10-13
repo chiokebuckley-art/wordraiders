@@ -338,5 +338,6 @@ if (QS.has('test')) window.__gj = { S: () => S, RUN: () => RUN, V: () => V, E, P
  if (S.placedGrade) await load(`content-g${G()}`);
  if (S.activePlacement) { await load('content-place'); await load('content-g1'); V = { screen: 'place' }; }
  setTodayLabel(); persist(); render();
+ if (QS.has('place') && !S.activePlacement) { if (S.chosenGrade == null) S.chosenBy = 'auto'; startPlacement(S.chosenGrade ? Math.min(S.chosenGrade, MAXPLACE) : 1); return; }
  if (QS.has('today') && S.placedGrade && !S.activePlacement && !S.days[TODAY()]?.done) { const u = E.currentUnit(S, G(), UN()), n = u && E.nextPassage(S, G(), u, PASSAGES, TODAY()); if (n?.p) startPassage(n.p, n.kind, { unit: u.id }); }
 })();
