@@ -150,8 +150,8 @@ function pickCheckView(){
  <button class="primary big" data-act="check-chosen">Check my starting point</button><button class="btn wide" data-act="not-now">Not now, start Grade ${g}</button></main>`;
 }
 function skipCheckView(){
- return bar('Find your level', 'pick') + `<main><p class="eyebrow">LET’S FIND YOUR LEVEL!</p><h1>Read some words, then a short story. ${hear('Let’s find your level! Read some words, then a short story.')}</h1><p class="lead">About 10 minutes. You can stop halfway and finish later.</p>
- <button class="primary big" data-act="check-skip">Start the check</button><button class="btn wide" data-act="skip-all">Skip, start at Grade 1</button><p class="small muted">You can do the check later in the grown-up page.</p></main>`;
+ return bar('Find your level', 'pick') + `<main><p class="eyebrow">SKIPPED · STARTING AT GRADE 1</p><h1>Want us to find your level? ${hear('Want us to find your level? Read some words, then a short story. Or just start at Grade 1.')}</h1><p class="lead">A quick check (about 10 minutes): read some words, then a short story. Or just start at Grade 1. You can change the grade any time.</p>
+ <button class="primary big" data-act="check-skip">Start the check</button><button class="btn wide" data-act="skip-all">Start at Grade 1</button><p class="small muted">You can do the check later in the grown-up page.</p></main>`;
 }
 function placeView(){
  const A = S.activePlacement; if (!A) return homeView();
@@ -286,11 +286,11 @@ app.addEventListener('click', e => { const b = e.target.closest('[data-act]'); i
  if (a === 'say') { say(b.dataset.text, true); return; }
  if (a === 'nav') { e.preventDefault(); clearInterval(oralTimer); RUN = null; go(b.dataset.to || 'home'); return; }
  if (a === 'pick') { go('pick-check', { g: +b.dataset.g }); return; }
- if (a === 'skip') { go('skip-check'); return; }
+ if (a === 'skip') { E.skipAll(S); S.pickerSkipped = true; persist(); load('content-g1').then(() => go('skip-check')); return; }
  if (a === 'not-now') { const by = document.querySelector('input[name=by]:checked')?.value || 'player'; E.chooseGrade(S, V.g, by); persist(); V = { screen: 'home' }; regrade(); return; }
  if (a === 'check-chosen') { const by = document.querySelector('input[name=by]:checked')?.value || 'player'; E.chooseGrade(S, V.g, by); startPlacement(Math.min(V.g, MAXPLACE)); return; }
  if (a === 'check-skip') { if (S.chosenGrade == null) S.chosenBy = 'auto'; startPlacement(S.chosenGrade ? Math.min(S.chosenGrade, MAXPLACE) : 1); return; }
- if (a === 'skip-all') { E.skipAll(S); persist(); V = { screen: 'home' }; regrade(); return; }
+ if (a === 'skip-all') { if (!S.placedGrade) E.skipAll(S); persist(); V = { screen: 'home' }; regrade(); return; }
  if (a === 'words-go') { S.activePlacement.step = 'words'; persist(); render(); return; }
  if (a === 'words-skip') { S.activePlacement.word = false; S.activePlacement.step = 'comp-intro'; persist(); render(); return; }
  if (a === 'mark') { const A = S.activePlacement; A.marks.push(b.dataset.v === '1'); if (E.ladderDone(A.marks) || A.marks.length >= LADDER.length) { A.word = true; A.step = 'comp-intro'; } persist(); render(); return; }
