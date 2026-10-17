@@ -6,6 +6,7 @@
 import {GRADES, LADDER} from './grades.js?v=gj-2';
 import * as E from './engine.js?v=gj-2';
 import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=3';
+import {miss as notebookMiss} from '../wr-notebook.js?v=nb-1';
 
 const app = document.querySelector('#app');
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -53,7 +54,9 @@ function makeQ(){
 function onPick(pos){
  const Q = RUN.q; if (Q.done) return;
  const chosen = Q.order[pos], right = chosen === Q.q.answer;
- if (Q.first === null) { Q.first = right; RUN.answers.push({ correct: right, firstTry: true, shownOrder: Q.order, pos: Q.order.indexOf(Q.q.answer) }); }
+ if (Q.first === null) { Q.first = right; RUN.answers.push({ correct: right, firstTry: true, shownOrder: Q.order, pos: Q.order.indexOf(Q.q.answer) });
+  // Practice and book misses go to the Notebook; unit checks, challenges and placement never do (their texts stay new).
+  if (!right && (RUN.kind === 'practice' || RUN.kind === 'book')) notebookMiss({ src: 'gj', ref: RUN.p.id, skill: Q.q.type, label: RUN.p.title, prompt: Q.q.q, given: Q.q.options[chosen], right: Q.q.options[Q.q.answer], extra: { qi: RUN.qi, grade: RUN.p.grade || G() } }); }
  Q.picked = pos;
  if (right) { Q.done = true; render(); say(Q.first ? 'Yes!' : 'That’s it.'); return; }
  Q.retry = true; render(); say('Not quite. Look at the story again. Tap the green one.');

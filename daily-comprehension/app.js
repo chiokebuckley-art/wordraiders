@@ -9,6 +9,7 @@ import {panel} from '../sentence-decoder/art.js?v=fs-1';
 import {PASSAGES as G1} from '../grade-journey/content-g1.js?v=gj-2';
 import {PASSAGES as G2} from '../grade-journey/content-g2.js?v=gj-2';
 import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=3';
+import {miss as notebookMiss} from '../wr-notebook.js?v=nb-1';
 
 const app = document.querySelector('#app');
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -92,6 +93,7 @@ function onPick(pos){
   if (q.kind === 'retrieve') RUN.retrieve = ok;
   if (q.kind === 'review') { E.recordReview(S, step().id, ok, TODAY()); }
   persist();
+  if (!ok && q.kind !== 'show') { const id = q.kind === 'review' ? step().id : RUN.t.id, t = q.kind === 'review' ? RUN.revT : RUN.t; notebookMiss({ src: 'dc', ref: id, skill: q.kind === 'review' ? 'retrieve' : q.kind, label: t.title || t.text.slice(0, 40), prompt: q.kind === 'meaning' ? `What does it mean? ${t.text}` : q.src?.q || '', given: q.order[pos].x, right: q.order[q.right].x, extra: q.kind === 'pq' ? { qi: q.src.i } : null }); }
  }
  q.picked = pos;
  const o = q.order[pos];
@@ -102,6 +104,7 @@ function m5Pick(n, kind){ if (RUN.m5.checked) return; RUN.m5.picks[n] = kind; re
 function m5Check(){
  const M = RUN.m5; if (Object.keys(M.picks).length < 3) return;
  const ok = M.items.every((it, n) => M.picks[n] === it.kind);
+ if (M.first === null && !ok) { const n = M.items.findIndex((it, j) => M.picks[j] !== it.kind), it = M.items[n], LAB = { fact: 'The text says it', guess: 'Fair guess', notThere: 'Not in the text' }; notebookMiss({ src: 'dc', ref: RUN.t.id, skill: 'm5', label: RUN.t.title || RUN.t.text.slice(0, 40), prompt: `“${it.x}”: fact, fair guess, or not in the text?`, given: LAB[M.picks[n]], right: LAB[it.kind], extra: { kind: it.kind } }); }
  if (M.first === null) { M.first = ok; RUN.inference = ok; E.logAttempt(S, { at: Date.now(), contentId: RUN.t.id, version: 1, skills: ['M5'], promptType: 'fact-guess-not', response: JSON.stringify(M.picks), correct: ok, firstTry: true, hinted: false, audioAssisted: RUN.audio, confidence: RUN.confidence }); persist(); }
  M.checked = true; render(); say(ok ? 'Yes! You sorted all three.' : 'Look at the green labels to see where each one goes.');
 }

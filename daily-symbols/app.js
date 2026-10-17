@@ -5,6 +5,7 @@
 import {MARKS, SLOT, ACCENT} from './content.js?v=ds-1';
 import {fresh, dayKey, addDays, seeded, shuffle, stopsReached, modeFor, refreshUnlocks, grownUpUnlock, status, tierOpen, planDay, introduce, answer, setGlyphs, opener} from './engine.js?v=ds-1';
 import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=3';
+import {miss as notebookMiss} from '../wr-notebook.js?v=nb-1';
 
 const app = document.querySelector('#app');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -119,11 +120,12 @@ function logAnswer(q, response, correct){
  answer(S, id, { correct, hinted: q.hinted, type: q.type }, A.date);
  A.results.push({ id, ok: correct, hinted: q.hinted, type: q.type });
  persist();
+ if (!correct && !q.it.practice) notebookMiss({ src: 'sym', ref: id, skill: 'mark', label: `${q.m.name} ${q.m.glyph}`, prompt: q.s.s.replace(/\{[^{}]*\}/g, '___'), given: response || 'another spot', right: `${optLabel(q.m, q.s, q.target)} ${optName(q.m, q.target)}`, lookalike: !!q.pickedId && q.s.wrong.includes(q.pickedId), extra: { sent: q.it.sent, picked: q.pickedId || null } });
 }
 function onPick(pos){
  const q = RUN.q; if (q.done) return;
  const chosen = q.opts[pos], right = chosen === q.target;
- if (q.first === null) { q.first = right && q.tapWrong !== false; logAnswer(q, optLabel(q.m, q.s, chosen), q.first); }
+ if (q.first === null) { q.pickedId = chosen; q.first = right && q.tapWrong !== false; logAnswer(q, optLabel(q.m, q.s, chosen), q.first); }
  q.picked = pos;
  if (right) { q.done = true; render(); say(`${q.first ? 'Yes! ' : ''}${feedback(q)}`); return; }
  q.retry = true; render(); say(`Not quite. ${feedback(q)} Tap the green one.`);

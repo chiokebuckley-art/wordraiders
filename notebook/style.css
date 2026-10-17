@@ -1,0 +1,16 @@
+/* My Notebook: cards, a week strip, clean-fix dots. Question screens reuse Daily Comprehension's styles. */
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:14px 0}
+.week span{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;border-radius:12px;background:var(--card);border:1px solid var(--line)}
+.week span b{font-size:13px;color:var(--muted)}.week span i{font-style:normal;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--card2);font-weight:900}
+.week span.on i{background:var(--lime);color:#14240a}.week span.now{border-color:var(--sky)}
+.sec{font-size:19px;margin:20px 0 6px}
+.nblist{list-style:none;padding:0;margin:8px 0;display:grid;gap:10px}
+.nbcard{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:12px 14px}.nbcard.due{border-color:#ff9f43}.nbcard.cleared{opacity:.8}
+.nbhead{display:flex;justify-content:space-between;gap:10px;align-items:center}.where{font-weight:900;color:var(--sky);font-size:15px}
+.nbq{margin:6px 0 4px;font-weight:800;font-size:17px}.nbans{margin:0 0 6px;font-size:16px}.nbans s{color:#ffb27a}.nbans b{color:var(--lime)}
+.nbkind{margin:0 0 8px;font-size:14px;color:#dbe6f2}.chip{display:inline-block;padding:2px 8px;border-radius:999px;background:#ff9f4326;border:1px solid #ff9f4366;color:#ffd2ad;font-weight:800;font-size:13px;margin-right:4px}
+.nbfoot{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cleandots{display:inline-flex;gap:4px}.cleandots i{width:12px;height:12px;border-radius:50%;background:var(--card2);border:1px solid #3a5878}.cleandots i.on{background:var(--lime);border-color:var(--lime)}
+.steps span.miss{background:#ff9f43}
+.ptext mark{background:#ffc85788;color:inherit;border-radius:6px;padding:0 4px}
+.pic-opt svg{max-height:200px}

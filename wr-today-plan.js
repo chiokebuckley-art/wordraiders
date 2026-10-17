@@ -4,10 +4,10 @@
 // and the rest are marked "extra" (still tappable, but skipped by "Next task"). Finished rows still count toward the
 // day's minutes, so finishing early doesn't keep adding more.
 (function(){
- var MIN = { box: 3, journey: 5, grade: 5, 'daily-comprehension': 5, quest: 3, spell: 3, definitions: 5, symbols: 4, littlewords: 12, sound: 7, connecting: 4, picture: 5, raid: 4 };
+ var MIN = { box: 3, journey: 5, grade: 5, 'daily-comprehension': 5, notebook: 4, quest: 3, spell: 3, definitions: 5, symbols: 4, littlewords: 12, sound: 7, connecting: 4, picture: 5, raid: 4 };
  // Young readers (Grades 1–2 or no grade yet): reading and phonics first. Older readers: grade work and vocabulary.
- var YOUNG = ['grade', 'daily-comprehension', 'sound', 'littlewords', 'box', 'symbols', 'definitions', 'quest', 'spell', 'connecting', 'picture', 'journey', 'raid'];
- var OLDER = ['grade', 'definitions', 'symbols', 'box', 'quest', 'spell', 'connecting', 'daily-comprehension', 'journey', 'littlewords', 'picture', 'sound', 'raid'];
+ var YOUNG = ['grade', 'daily-comprehension', 'notebook', 'sound', 'littlewords', 'box', 'symbols', 'definitions', 'quest', 'spell', 'connecting', 'picture', 'journey', 'raid'];
+ var OLDER = ['grade', 'notebook', 'definitions', 'symbols', 'box', 'quest', 'spell', 'connecting', 'daily-comprehension', 'journey', 'littlewords', 'picture', 'sound', 'raid'];
  function read(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
  function minutes(r){ if (MIN[r.key] != null) return MIN[r.key]; var m = /(\d+)\s*min/.exec(r.meta || ''); return m ? +m[1] : 5; }
  window.wrTodayPlan = function(rows, pid){
