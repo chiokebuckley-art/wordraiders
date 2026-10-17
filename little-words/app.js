@@ -6,6 +6,7 @@ import {illustration} from '../common-words/art.js?v=lw-1';
 import {KID} from './words.js?v=lw-1';
 import * as E from './engine.js?v=lw-1';
 import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=3';
+import {miss as notebookMiss} from '../wr-notebook.js?v=nb-1';
 
 const app = document.querySelector('#app');
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -79,6 +80,7 @@ function onPick(pos){
   E.answer(S, q.u.id, ok, TODAY()); d.results.push({ id: q.u.id, type: q.type, ok });
   S.log.push({ day: TODAY(), id: q.u.id, type: q.type, shown: q.opts.map(o => o.key), pos: q.right, pick: pos, ok }); if (S.log.length > 600) S.log.splice(0, S.log.length - 600);
   persist();
+  if (!ok) { const o = q.opts[pos], look = o.key === q.u.wrong || o.kind === q.u.wrong || BY[o.key]?.scene === q.u.wrong; notebookMiss({ src: 'lw', ref: q.u.id, skill: q.type, label: q.u.word, prompt: q.type === 'gap' ? `Which word fits? ${gapSentence(q.u)}` : q.type === 'picture' ? `Which picture shows “${q.u.word}”?` : `What does “${q.u.word}” mean?`, given: o.label || 'another picture', right: q.type === 'picture' ? 'the picture of ' + q.u.use : q.opts[q.right].label, lookalike: look }); }
  }
  q.picked = pos;
  if (ok) { q.done = true; render(); say(`${q.first ? 'Yes! ' : ''}${KID[q.u.id]}`); return; }
