@@ -9,6 +9,10 @@ import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=3';
 const app = document.querySelector('#app');
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const QS = new URLSearchParams(location.search);
+// The Notebook lives inside the main app (../wr-notebook-overlay.js shows this page over it). Links back to the main
+// app close the Notebook there instead of loading a second copy of the app.
+const EMBED = QS.has('embed') && window.parent !== window;
+const host = () => { try { return window.parent.wrNotebook ? window.parent : null; } catch { return null; } };
 const TODAY = () => N.dayKey();
 const P = N.activePlayer(), SKEY = `wr-notebook-settings.${P.id}`;
 let B = N.load(P.id);
@@ -74,7 +78,7 @@ function next(){
 
 // ---------- screens ----------
 const fmtDay = k => { const t = TODAY(); if (k <= t) return 'today'; if (k === N.addDays(t, 1)) return 'tomorrow'; const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d, 12).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }); };
-function bar(title){ const inside = !!RUN; return `<header class="bar"><a href="${inside ? '#' : '../#/home'}" data-act="${inside ? 'home' : ''}" class="back">${inside ? '← Notebook' : '← WordRaiders'}</a><span class="title">${esc(title)}</span><button class="readto" data-act="readto" aria-pressed="${SET.read}" aria-label="Read to me">${SET.read ? SPK : MUTE}</button></header>`; }
+function bar(title){ const inside = !!RUN; return `<header class="bar"><a href="${inside ? '#' : '../#/home'}" data-act="${inside ? 'home' : EMBED ? 'close' : ''}" class="back">${inside ? '← Notebook' : '← WordRaiders'}</a><span class="title">${esc(title)}</span><button class="readto" data-act="readto" aria-pressed="${SET.read}" aria-label="Read to me">${SET.read ? SPK : MUTE}</button></header>`; }
 const dotsOf = c => `<span class="cleandots" aria-label="${c.clean} of ${N.CLEAN_TO_CLEAR} clean fixes">${Array.from({ length: N.CLEAN_TO_CLEAR }, (_, i) => `<i class="${i < c.clean ? 'on' : ''}"></i>`).join('')}</span>`;
 function cardHTML(c, today){
  const due = !c.clearedAt && c.due <= today, E = N.ERRORS[c.kind] || N.ERRORS.unknown;
@@ -158,9 +162,18 @@ function setToday(){ const pg = N.page(B); B.today = { date: TODAY(), label: pg.
 function speakScreen(){ const q = RUN?.qs[RUN.i]; if (!q || RUN.q.reading) { if (q?.lead) say(q.lead.text); return; } say(q.say); }
 
 // ---------- events ----------
+if (EMBED) document.addEventListener('click', e => {
+ const a = e.target.closest('a[href]'); if (!a || a.dataset.act) return; const H = host(); if (!H) return;
+ const u = new URL(a.getAttribute('href'), location.href), top = H.location;
+ if (u.origin !== top.origin || u.pathname !== top.pathname) return;
+ e.preventDefault();
+ if (u.search) { top.href = u.href; return; }
+ H.wrNotebook.close(true); if (u.hash && u.hash !== top.hash) top.hash = u.hash;
+}, true);
 app.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'spell') { e.preventDefault(); onCheck(); } });
 app.addEventListener('change', e => { if (e.target.dataset.act === 'read-box') { SET.read = e.target.checked; try { localStorage.setItem(SKEY, JSON.stringify(SET)); } catch {} } });
 app.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b || b.disabled || b.tagName === 'INPUT') return; const a = b.dataset.act;
+ if (a === 'close') { e.preventDefault(); host()?.wrNotebook.close(); return; }
  if (a === 'say') { say(b.dataset.text, true); return; }
  if (a === 'readto') { SET.read = !SET.read; try { localStorage.setItem(SKEY, JSON.stringify(SET)); } catch {} if (!SET.read) speechSynthesis?.cancel?.(); render(); return; }
  if (a === 'home') { e.preventDefault(); RUN = null; V = { screen: 'home' }; render(); return; }
