@@ -1,5 +1,6 @@
 // WordRaiders Notebook (the wrong-answer notebook, 错题本), the same habit as Engineering Quest's Notebook.
-// Every first-try miss in a daily page (Little Words, Daily Symbols, Daily Comprehension, Grade Journey practice)
+// Every first-try miss in a daily page (Little Words, Daily Symbols, Daily Comprehension, Grade Journey practice) or
+// in the Arcades (Word Arcade, Sentence Arcade, Spelling; see wr-arcade-notebook.js)
 // becomes a card: what was asked, what the child answered, and what kind of mistake it was. Fixing a card means the
 // original again, three questions of the same kind, then one twist. A fix is clean when the original and the three
 // are right the first time (the twist may be wrong). Three clean fixes, spaced (today, 3 days, 7 days), clear it.
@@ -15,6 +16,10 @@ export const ERRORS = {
  memory: { label: 'Forgot after hiding', advice: 'Before you hide it, say it in your own words: who did what?' },
  guess: { label: 'Fact or guess mix-up', advice: 'Ask: are these words in the text? If not, is there a clue that makes it a fair guess?' },
  bigidea: { label: 'Missed the big idea', advice: 'Ask: what is it mostly about? What does the writer want us to know?' },
+ part: { label: 'Sentence part mix-up', advice: 'Ask the sentence a question: who or what is it about? What happens? Then tap the words that answer it.' },
+ grammar: { label: 'Grammar mix-up', advice: 'Read each choice aloud. Which one keeps the meaning and fits who is doing it and when?' },
+ form: { label: 'Word form mix-up', advice: 'Look for the clue words (yesterday, two, many…). They tell you which form the word needs.' },
+ spelling: { label: 'Spelling slip', advice: 'Say the word slowly and hear each sound. Which letters spell each sound in this pattern?' },
  mark: { label: 'Wrong mark', advice: 'Say the sentence out loud. Is it telling, asking or showing a feeling? What does the mark do?' },
  unknown: { label: 'Off track', advice: 'Read it slowly once more, then try the ones like it.' },
 };
@@ -23,6 +28,11 @@ const BIG = ['main', 'theme', 'author', 'claim', 'craft', 'compare', 'inference'
 export function classify(src, skill, lookalike){
  if (lookalike) return 'lookalike';
  if (src === 'sym') return 'mark';
+ if (skill === 'sentence') return 'part';
+ if (skill === 'syntax') return 'grammar';
+ if (skill === 'forms') return 'form';
+ if (skill === 'spell') return 'spelling';
+ if (skill === 'word') return 'meaning';
  if (src === 'lw') return 'meaning';
  if (skill === 'retrieve' || skill === 'review') return 'memory';
  if (skill === 'm5') return 'guess';

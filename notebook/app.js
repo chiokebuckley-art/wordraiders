@@ -2,8 +2,8 @@
 // Misses from the daily pages become cards (../wr-notebook.js). Today's page: fix up to 3 due cards (the one you
 // missed, three like it, one twist); nothing due → a 5-question check-up from your own old mistakes. A week strip
 // and a streak count every day with a fix or a check-up.
-import * as N from '../wr-notebook.js?v=nb-1';
-import {buildFix, cousin, whereOf} from './sources.js?v=nb-1';
+import * as N from '../wr-notebook.js?v=nb-2';
+import {buildFix, cousin, whereOf} from './sources.js?v=nb-2';
 import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=3';
 
 const app = document.querySelector('#app');
@@ -40,16 +40,28 @@ async function startCheckup(){
  if (!qs.length) { flash('Nothing to check yet.'); return; }
  RUN = { mode: 'checkup', qs, i: 0, results: [], misses: 0 }; enter();
 }
-function enter(){ const q = RUN.qs[RUN.i]; RUN.q = { picked: null, tries: 0, done: false, first: null, hidden: !!q.lead?.hide, reading: !!q.lead?.hide, looks: 0 }; V = { screen: 'run' }; render(); speakScreen(); window.scrollTo(0, 0); }
-function onPick(pos){
- const Q = RUN.q, q = RUN.qs[RUN.i]; if (Q.done) return;
- const ok = pos === q.right; Q.picked = pos; Q.tries++;
- if (Q.first === null) { Q.first = ok; RUN.results.push(ok); if (!ok && RUN.mode === 'checkup') { RUN.misses++; N.addMiss(B, { ...q.meta, prompt: q.prompt, given: optText(q, pos), right: optText(q, q.right) }); persist(); } }
+function enter(){ const q = RUN.qs[RUN.i]; RUN.q = { picked: null, sel: new Set(), seq: [], typed: '', tries: 0, done: false, first: null, hidden: !!q.lead?.hide, reading: !!q.lead?.hide, looks: 0 }; V = { screen: 'run' }; render(); speakScreen(); window.scrollTo(0, 0); }
+function onPick(pos){ const q = RUN.qs[RUN.i]; if (RUN.q.done) return; RUN.q.picked = pos; answer(pos === q.right, optText(q, pos)); }
+/** Tap questions: the tapped words must be exactly the answer words. Spell questions: exactly the word. */
+function onCheck(){
+ const q = RUN.qs[RUN.i], Q = RUN.q; if (Q.done) return;
+ if (q.type === 'order') { if (!Q.seq.length) return; Q.picked = 0; const ok = Q.seq.length === q.answer.length && Q.seq.every((v, i) => v === q.answer[i]); answer(ok, Q.seq.map(i => q.tokens[i]).join(' ')); return; }
+ if (q.type === 'tap') { const a = [...q.answer].sort((x, y) => x - y), b = [...Q.sel].sort((x, y) => x - y); if (!b.length) return; Q.picked = 0; answer(a.length === b.length && a.every((v, i) => v === b[i]), b.map(i => q.tokens[i]).join(' ')); return; }
+ const typed = (document.querySelector('#spell')?.value || '').trim(); if (!typed) return; Q.typed = typed; Q.picked = 0;
+ const norm = x => x.toLowerCase().replace(/[’‘`´]/g, "'").replace(/\s+/g, '');
+ answer(norm(typed) === norm(q.word), typed);
+}
+function answer(ok, given){
+ const Q = RUN.q, q = RUN.qs[RUN.i]; Q.tries++;
+ if (Q.first === null) { Q.first = ok; RUN.results.push(ok); if (!ok && RUN.mode === 'checkup') { RUN.misses++; N.addMiss(B, { ...q.meta, prompt: q.prompt, given, right: rightText(q) }); persist(); } }
  if (ok) { Q.done = true; render(); say(Q.tries === 1 ? 'Yes!' : 'That’s it.'); return; }
- if (Q.tries >= 2) { Q.done = true; Q.shown = true; render(); say(`The answer is ${optText(q, q.right)}. ${q.explain || ''}`); return; }
+ if (Q.tries >= 2) { Q.done = true; Q.shown = true; render(); say(`The answer is ${rightText(q)}. ${q.explain || ''}`); return; }
+ if (q.type === 'tap') Q.sel = new Set();
+ if (q.type === 'order') Q.seq = [];
  render(); say(`Not yet. ${N.ERRORS[RUN.card?.kind || 'unknown'].advice} Try again.`);
 }
 const optText = (q, i) => q.opts[i]?.x ?? `picture ${i + 1}`;
+const rightText = q => q.type === 'tap' || q.type === 'order' ? q.answer.map(i => q.tokens[i]).join(' ') : q.type === 'spell' ? q.word : optText(q, q.right);
 function next(){
  RUN.i++;
  if (RUN.i < RUN.qs.length) { enter(); return; }
@@ -77,7 +89,7 @@ function homeView(){
  const today = TODAY(), pg = N.page(B, today), open = N.activeCards(B), due = open.filter(c => c.due <= today), later = open.filter(c => c.due > today), cleared = B.cards.filter(c => c.clearedAt && !c.gone).sort((a, b) => b.clearedAt - a.clearedAt).slice(0, 8);
  const wk = `<div class="week" aria-label="This week">${pg.week.map(d => `<span class="${d.done ? 'on' : ''} ${d.today ? 'now' : ''}"><b>${d.label}</b><i>${d.done ? '✓' : ''}</i></span>`).join('')}</div>`;
  let top;
- if (pg.mode === 'empty') top = `<h1>Your notebook is empty.</h1><p class="lead">When you miss a question in Little Words, Daily Symbols, Daily Comprehension or Grade Journey, it lands here as a card. Fixing a card three times, spaced out over a week, clears it.</p>`;
+ if (pg.mode === 'empty') top = `<h1>Your notebook is empty.</h1><p class="lead">When you miss a question in the daily tasks or the Arcades, it lands here as a card. Fixing a card three times, spaced out over a week, clears it.</p>`;
  else if (pg.mode === 'fix') top = `<h1>Today’s page: fix ${pg.target - pg.fixed} card${pg.target - pg.fixed > 1 ? 's' : ''}.</h1><p class="lead">Each fix is the one you missed, three like it, and one twist. ${pg.fixed ? `${pg.fixed} done today.` : ''}</p><button class="primary big" data-act="go">▶ Fix the next card</button>`;
  else if (pg.mode === 'checkup') top = `<h1>Nothing to fix today!</h1><p class="lead">Do a quick check-up: ${N.CHECKUP_SIZE} questions like your old mistakes. Do they still hold?</p><button class="primary big" data-act="checkup">▶ Start the check-up</button>`;
  else top = `<h1>Today’s page is done! 🎉</h1><p class="lead">${pg.fixed ? `${pg.fixed} fix${pg.fixed > 1 ? 'es' : ''}` : 'Check-up'} done today.${due.length ? ' Extra fixes are welcome, but not needed.' : ''}</p><div class="row"><a class="primary" href="../?today=next#/home">Next task ▸</a><a class="btn" href="../#/home">Back to Home</a></div>`;
@@ -88,16 +100,16 @@ function homeView(){
  ${cleared.length ? `<details class="about"><summary>Cleared cards · ${B.cards.filter(c => c.clearedAt && !c.gone).length}</summary><ul class="nblist">${cleared.map(c => cardHTML(c, today)).join('')}</ul></details>` : ''}
  ${eb ? `<p class="tip">The main game’s Error Book also has ${eb} topic${eb > 1 ? 's' : ''} to repair. <a href="../#progress">Open Progress ▸</a></p>` : ''}
  <details class="about"><summary>For grown-ups</summary>
-  <p>This is a wrong-answer notebook (错题本), the same habit as Engineering Quest’s Notebook. Every first-try miss in Little Words, Daily Symbols, Daily Comprehension and Grade Journey practice becomes a card showing the question, what your child chose, the right answer and the kind of mistake (look-alike mix-up, meaning, missed detail, forgot after hiding, fact or guess, big idea, wrong mark).</p>
+  <p>This is a wrong-answer notebook (错题本), the same habit as Engineering Quest’s Notebook. Every first-try miss in Little Words, Daily Symbols, Daily Comprehension, Grade Journey practice, and every wrong answer in the Arcades (Word Arcade, Sentence Arcade and its grammar skills, Spelling Arcade and Spelling lessons, Common Word Arcade) becomes a card showing the question, what your child chose, the right answer and the kind of mistake (look-alike mix-up, meaning, missed detail, forgot after hiding, fact or guess, big idea, wrong mark, sentence part, grammar, word form, spelling). Arcade cards are saved with questions of the same kind (the same word part, sentence part, grammar skill or spelling pattern), so fixes use the arcade’s own questions.</p>
   <p>A fix is the original question, three of the same kind (the same word or mark in new sentences, the same question type on another text) and one twist that changes the kind. It is clean when the original and the three are right the first time. Clean fixes are spaced: today, then 3 days, then 7 days; the third clears the card. An unclean fix brings the card back tomorrow, and missing the same question again counts as a slip on the same card. Home asks for up to 3 fixes a day; with nothing due it offers a 5-question check-up, and a check-up miss becomes a new card. Grade Journey unit checks and placement are never added, so those texts stay new.</p>
   <label class="tog"><input type="checkbox" data-act="read-box" ${SET.read ? 'checked' : ''}> Read questions aloud</label>
  </details></main>`;
 }
 function leadHTML(q){
- const Q = RUN.q, L = q.lead; if (!L) return '';
+ const Q = RUN.q, L = q.lead; if (!L) return q.pic ? `<div class="figpic">${q.pic}</div>` : '';
  if (Q.hidden && !Q.reading) return `<div class="hidden-box"><span>Text hidden</span></div>${Q.first === null ? `<button class="btn wide" data-act="reveal">Show again (${Q.looks})</button>` : ''}`;
  const body = esc(L.text).replace(/«([^»]*)»/g, '<mark>$1</mark>');
- return `<article class="passage">${L.title ? `<h2 class="ptitle">${esc(L.title)}</h2>` : ''}<div class="ptext ${L.text.length < 120 ? 'one' : ''}">${body}</div></article>`;
+ return `<article class="passage">${L.title ? `<h2 class="ptitle">${esc(L.title)}</h2>` : ''}<div class="ptext ${L.text.length < 120 ? 'one' : ''}">${body}</div></article>${q.pic ? `<div class="figpic">${q.pic}</div>` : ''}`;
 }
 function optsHTML(q){
  const Q = RUN.q, cls = pos => { if (Q.picked === null) return ''; if (pos === q.right && Q.done) return 'right'; if (pos === Q.picked && pos !== q.right) return 'wrong'; return ''; };
@@ -108,11 +120,26 @@ function stepName(){ if (RUN.mode === 'checkup') return `CHECK-UP · ${RUN.i + 1
 function runView(){
  const q = RUN.qs[RUN.i], Q = RUN.q, n = RUN.qs.length;
  const dots = `<div class="steps" aria-label="Question ${RUN.i + 1} of ${n}">${RUN.qs.map((_, i) => `<span class="${i < RUN.i ? (RUN.results[i] ? 'done' : 'miss') : i === RUN.i ? 'now' : ''}"></span>`).join('')}</div>`;
- const head = `<p class="eyebrow">${stepName()}</p>${RUN.mode === 'fix' && RUN.i === 0 ? `<p class="small muted">Last time you chose “${esc(RUN.card.given)}”. ${esc(N.ERRORS[RUN.card.kind]?.advice || '')}</p>` : ''}`;
+ const head = `<p class="eyebrow">${stepName()}</p>${RUN.mode === 'fix' && RUN.i === 0 ? `<p class="small muted">Last time you ${RUN.card.skill === 'spell' ? 'wrote' : 'chose'} “${esc(RUN.card.given)}”. ${esc(N.ERRORS[RUN.card.kind]?.advice || '')}</p>` : ''}`;
  if (Q.reading) return bar('Read it') + `<main class="round">${dots}<section class="card">${head}${leadHTML(q)}<p class="small muted">Read it, then it hides and you answer from memory.</p><button class="primary big" data-act="hide">I read it ▸</button></section></main>`;
- const fb = Q.done ? `<p class="fb ${Q.shown ? 'try' : 'ok'}">${Q.tries === 1 ? 'Yes! ' : Q.shown ? 'The green one is right. ' : 'That’s it. '}${esc(q.explain)}</p><button class="primary big" data-act="next">${RUN.i + 1 < n ? 'Next ▸' : 'Finish ▸'}</button>`
+ const fb = Q.done ? `<p class="fb ${Q.shown ? 'try' : 'ok'}">${Q.tries === 1 ? 'Yes! ' : Q.shown ? (q.type === 'spell' ? `It’s spelled ${esc(q.word)}. ` : q.type === 'tap' ? 'The green words are right. ' : q.type === 'order' ? 'Here is the right order. ' : 'The green one is right. ') : 'That’s it. '}${esc(q.explain)}</p><button class="primary big" data-act="next">${RUN.i + 1 < n ? 'Next ▸' : 'Finish ▸'}</button>`
   : Q.picked !== null ? `<p class="fb try">Not yet. Look again and try once more.</p>` : '';
- return bar(RUN.mode === 'fix' ? 'Fix it' : 'Check-up') + `<main class="round">${dots}<section class="card">${head}${leadHTML(q)}<p class="q">${esc(q.prompt)} ${hear(q.say, 'Hear the question')}</p>${optsHTML(q)}${fb}</section></main>`;
+ return bar(RUN.mode === 'fix' ? 'Fix it' : 'Check-up') + `<main class="round">${dots}<section class="card">${head}${leadHTML(q)}<p class="q">${esc(q.prompt)} ${hear(q.say, q.type === 'spell' ? 'Hear the word' : 'Hear the question')}</p>${q.type === 'tap' ? tapHTML(q) : q.type === 'order' ? orderHTML(q) : q.type === 'spell' ? spellHTML(q) : optsHTML(q)}${fb}</section></main>`;
+}
+function tapHTML(q){
+ const Q = RUN.q, show = Q.done;
+ return `<div class="taps">${q.tokens.map((t, i) => `<button class="tapw ${Q.sel.has(i) ? 'on' : ''} ${show && q.answer.includes(i) ? 'key' : ''}" data-act="tap" data-i="${i}" ${Q.done ? 'disabled' : ''}>${esc(t)}</button>`).join('')}</div>
+ ${Q.done ? '' : `<button class="primary big" data-act="check" ${Q.sel.size ? '' : 'disabled'}>Check</button>`}`;
+}
+function orderHTML(q){
+ const Q = RUN.q, built = Q.done ? q.answer : Q.seq;
+ return `<div class="built">${built.length ? built.map(i => `<span>${esc(q.tokens[i])}</span>`).join(' ') : '<em>Tap the words in order</em>'}</div>
+ <div class="taps">${q.tokens.map((t, i) => `<button class="tapw ${built.includes(i) ? 'used' : ''}" data-act="order" data-i="${i}" ${Q.done || built.includes(i) ? 'disabled' : ''}>${esc(t)}</button>`).join('')}</div>
+ ${Q.done ? '' : `<div class="row"><button class="btn" data-act="undo" ${Q.seq.length ? '' : 'disabled'}>↶ Undo</button><button class="primary big" data-act="check" ${Q.seq.length === q.tokens.length ? '' : 'disabled'}>Check</button></div>`}`;
+}
+function spellHTML(q){
+ const Q = RUN.q;
+ return `${q.meaning ? `<p class="small muted">It means: ${esc(q.meaning)}</p>` : ''}${Q.done ? `<p class="spelled">${esc(q.word)}</p>` : `<input id="spell" class="spellin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text" aria-label="Type the word" value="${esc(Q.typed)}"><button class="primary big" data-act="check">Check</button>`}`;
 }
 function fixedView(){
  const { out, card, chain } = V, pg = N.page(B), more = pg.mode === 'fix';
@@ -126,11 +153,12 @@ function checkedView(){
  return bar('Check-up') + `<main class="round"><section class="card result"><div class="burst">${V.misses ? '📒' : '🎉'}</div><h1>${V.right} of ${V.n} right</h1><p class="lead">${V.misses ? `${V.misses} new card${V.misses > 1 ? 's' : ''} in your notebook. You’ll fix ${V.misses > 1 ? 'them' : 'it'} tomorrow.` : 'Your old mistakes are holding. Great work!'}</p>
  <div class="row center"><a class="primary" href="../?today=next#/home">Next task ▸</a><button class="btn" data-act="tohome">My Notebook</button></div></section></main>`;
 }
-function render(){ app.innerHTML = RUN ? runView() : V.screen === 'fixed' ? fixedView() : V.screen === 'checked' ? checkedView() : homeView(); setToday(); }
+function render(){ app.innerHTML = RUN ? runView() : V.screen === 'fixed' ? fixedView() : V.screen === 'checked' ? checkedView() : homeView(); setToday(); const sp = document.querySelector('#spell'); if (sp) { sp.focus(); sp.select(); } }
 function setToday(){ const pg = N.page(B); B.today = { date: TODAY(), label: pg.done ? 'done' : pg.mode === 'fix' ? `${pg.target - pg.fixed} to fix` : pg.mode === 'checkup' ? 'check-up' : '' }; persist(); }
 function speakScreen(){ const q = RUN?.qs[RUN.i]; if (!q || RUN.q.reading) { if (q?.lead) say(q.lead.text); return; } say(q.say); }
 
 // ---------- events ----------
+app.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'spell') { e.preventDefault(); onCheck(); } });
 app.addEventListener('change', e => { if (e.target.dataset.act === 'read-box') { SET.read = e.target.checked; try { localStorage.setItem(SKEY, JSON.stringify(SET)); } catch {} } });
 app.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b || b.disabled || b.tagName === 'INPUT') return; const a = b.dataset.act;
  if (a === 'say') { say(b.dataset.text, true); return; }
@@ -142,6 +170,10 @@ app.addEventListener('click', e => { const b = e.target.closest('[data-act]'); i
  if (a === 'checkup') { startCheckup(); return; }
  if (!RUN) return;
  if (a === 'pick') { onPick(+b.dataset.pos); return; }
+ if (a === 'tap') { const i = +b.dataset.i; RUN.q.sel.has(i) ? RUN.q.sel.delete(i) : RUN.q.sel.add(i); render(); return; }
+ if (a === 'check') { onCheck(); return; }
+ if (a === 'order') { RUN.q.seq.push(+b.dataset.i); render(); return; }
+ if (a === 'undo') { RUN.q.seq.pop(); render(); return; }
  if (a === 'next') { next(); return; }
  if (a === 'hide') { RUN.q.reading = false; render(); speakScreen(); return; }
  if (a === 'reveal') { RUN.q.looks++; RUN.q.reading = true; render(); return; }
