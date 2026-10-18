@@ -1,5 +1,5 @@
 import {createWordRaidersSync} from './wordraiders-sync.js?v=journey-1';
-import {createArcade} from './arcade.js?v=journey-1';
+import {createArcade} from './arcade.js?v=journey-2';
 import {recordAnswer,DAY} from './engine.js';
 import {loadSave,saveBack} from './wordraiders-save.js';
 import {USES,UNITS,OBJECTS,TOTAL,SOURCES,sceneAt,nextIndex,stateFor,checkpoint,canOpen,complete} from './content.js';

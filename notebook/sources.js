@@ -47,7 +47,7 @@ const lw = {
   const look = LW[u.wrong] || USES.find(x => x.scene === u.wrong && x.id !== u.id) || shuffle(USES.filter(x => x.unit === u.unit && x.id !== u.id), rng)[0];
   return { original, variations, twist: lwQ(look, 'meaning', 1, rng) };
  },
- where: c => `Little Words · ${LW[c.ref]?.word || c.ref}`,
+ where: c => `${c.extra?.from === 'cw' ? 'Common Word Arcade' : 'Little Words'} · ${LW[c.ref]?.word || c.ref}`,
 };
 
 // ---------- Daily Symbols (asked as "which mark goes here?") ----------
@@ -135,7 +135,26 @@ const gj = {
  where: c => `Grade ${c.extra?.grade || 1} · ${c.label}`,
 };
 
-export const SOURCES = { lw, sym, dc, gj };
+// ---------- Arcades (cards made in the main app by wr-arcade-notebook.js, with their questions inside) ----------
+const GAME = { word: 'Word Arcade', sentence: 'Sentence Arcade', syntax: 'Sentence Arcade', forms: 'Sentence Arcade', spell: 'Spelling' };
+function arcadeQ(c, g){
+ const meta = { src: 'arcade', ref: c.ref, skill: c.skill, label: c.label, extra: c.extra };
+ if (g.type === 'tap') return { ...g, meta, lead: null, say: `${g.prompt} ${g.tokens.join(' ')}` };
+ if (g.type === 'order') return { ...g, meta, lead: null, say: `${g.prompt} ${g.tokens.join(', ')}` };
+ if (g.type === 'spell') return { ...g, meta, lead: null, prompt: 'Spell the word you hear.', explain: g.explain || (g.meaning ? `${g.word}: ${g.meaning}` : ''), say: `${g.word}. ${g.sentence || ''} ${g.word}.` };
+ const order = g.opts.map((o, i) => ({ ...o, ok: i === g.right }));
+ return { meta, lead: g.lead ? { text: g.lead } : null, pic: g.pic || '', prompt: g.prompt, opts: order.map(({ x }) => ({ x })), right: order.findIndex(o => o.ok), explain: g.explain || '', say: `${g.prompt} ${order.map(o => o.x).join('? ')}?` };
+}
+const arcade = {
+ build(c, rng){
+  const X = c.extra; if (!X?.orig) return null;
+  const mix = q => { if (q.type || !q.opts) return q; const o = shuffle(q.opts.map((x, i) => ({ ...x, ok: i === q.right })), rng); return { ...q, opts: o.map(({ x }) => ({ x })), right: o.findIndex(x => x.ok) }; };
+  return { original: arcadeQ(c, mix(X.orig)), variations: shuffle(X.same || [], rng).slice(0, 3).map(q => arcadeQ(c, mix(q))), twist: (X.twist || []).length ? arcadeQ(c, mix(shuffle(X.twist, rng)[0])) : null };
+ },
+ where: c => `${GAME[c.skill] || 'Arcade'} · ${c.label}`,
+};
+
+export const SOURCES = { lw, sym, dc, gj, arcade };
 /** Build a fix: original + up to 3 variations + twist (missing pieces are skipped). */
 export async function buildFix(card, seed){
  const S = SOURCES[card.src]; if (!S) return null;

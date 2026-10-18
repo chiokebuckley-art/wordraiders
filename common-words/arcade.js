@@ -2,6 +2,7 @@ import {USES,OBJECTS,sceneAt} from './content.js';
 import {illustration,describe,escape as esc} from './art.js';
 import {SENTENCE_COUNT,sceneIndex} from './arcade-bank.js';
 import {LANES,MODES,state,unlocked,useUnlocked,nextQuestion,record,mastery,modeOpen,modeLockReason} from './arcade-model.js';
+import {miss as notebookMiss} from '../wr-notebook.js?v=nb-2';
 let artSerial=0;
 export function arcadeArt(s,kind){const id='arc-tip-'+(++artSerial);return illustration(s,kind,{caption:false}).replaceAll('id="tip"',`id="${id}"`).replaceAll('url(#tip)',`url(#${id})`).replace('same object → it','same object').replace('A BOOK ABOUT','BOOK TOPIC').replace('PACKED BY ','PACKED: ').replace('>OR<','>CHOOSE ONE<');}
 const button=(s,a,attrs='',cls='')=>`<button class="${cls}" data-arcade="${a}" ${attrs}>${s}</button>`;
@@ -68,6 +69,8 @@ export function createArcade({profile,persist,shell,speak,announce,journey}){
  const correct=!late&&(q.recall?[q.answer,...q.aliases].map(s=>s.toLowerCase()).includes(normalized):q.choices[choice]?.correct===true);
  r.answered=true;r.lastCorrect=correct;r.attempts++;if(correct)r.correct++;r.combo=correct&&!r.hinted?r.combo+1:0;r.bestCombo=Math.max(r.bestCombo,r.combo);
  const clean=record(profile(),q,{correct,hinted:r.hinted});if(clean){r.clean++;r.score+=10+Math.min(20,r.combo*2);}
+ // A miss also goes to WordRaiders' My Notebook as a Little Words card for this meaning (picture questions show the look-alike picture).
+ if(!correct&&!late){const u=USES[q.u],pic=['picture','meaning','odd','swap'].includes(q.kind);notebookMiss({src:'lw',ref:u.id,skill:pic?'picture':'meaning',label:u.word,prompt:(q.text?q.text+' — ':'')+q.prompt,given:q.recall?String(choice):(q.choices?.[choice]?.label||'the other picture'),right:q.recall?q.answer:(q.choices?.find(c=>c.correct)?.label||'the picture of '+u.use),lookalike:pic,extra:{from:'cw'}});}
  if(r.mode==='Conquer'){const c=state(profile()).conquer[USES[r.target].id];c.at=Date.now();c.elapsed+=Date.now()-r.qStarted;if(clean&&!c.cleared.includes(q.o))c.cleared.push(q.o);else if(!clean)r.queue.push(q.o);}
  save();play();
  }
