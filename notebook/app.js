@@ -3,8 +3,9 @@
 // missed, three like it, one twist); nothing due → a 5-question check-up from your own old mistakes. A week strip
 // and a streak count every day with a fix or a check-up.
 import * as N from '../wr-notebook.js?v=nb-2';
-import {buildFix, cousin, whereOf} from './sources.js?v=nb-2';
+import {buildFix, cousin, whereOf} from './sources.js?v=nb-4';
 import {speak, blocked as voiceBlocked} from '../wr-voice.js?v=3';
+import {validSpell} from './spelling-questions.js?v=nb-spell-1';
 
 const app = document.querySelector('#app');
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -33,14 +34,16 @@ const hear = (t, label = 'Hear it') => `<button class="hear-btn" data-act="say" 
 // RUN = { mode: 'fix'|'checkup', card?, qs, i, results, q: {picked, tries, done, revealed, hidden}, chain }
 let RUN = null, V = { screen: 'home' };
 async function startFix(card, chain){
- const qs = await buildFix(card, SEED);
+ let qs;
+ try { qs = await buildFix(card, SEED); }
+ catch { flash('The practice words could not load. Your card is safe. Please try again.'); return; }
  if (!qs || !qs.length) { card.clearedAt = Date.now(); card.gone = true; persist(); flash('That question is no longer in the game, so the card was put away.'); render(); return; }
  RUN = { mode: 'fix', card, qs, i: 0, results: [], chain: !!chain }; enter();
 }
 async function startCheckup(){
  const today = TODAY(), healing = B.cards.filter(c => !c.clearedAt && c.due > today).sort((a, b) => b.lastAt - a.lastAt), cleared = B.cards.filter(c => c.clearedAt && !c.gone).sort((a, b) => b.clearedAt - a.clearedAt);
  const pick = [...healing.slice(0, 2), ...cleared.slice(0, 2), ...healing.slice(2), ...cleared.slice(2)], qs = [], seen = new Set();
- for (let round = 0; round < 3 && qs.length < N.CHECKUP_SIZE; round++) for (const c of pick) { if (qs.length >= N.CHECKUP_SIZE) break; const q = await cousin(c, `${SEED}:${today}`, round); const k = q && q.prompt + q.lead?.text; if (q && !seen.has(k)) { seen.add(k); qs.push(q); } }
+ for (let round = 0; round < 3 && qs.length < N.CHECKUP_SIZE; round++) for (const c of pick) { if (qs.length >= N.CHECKUP_SIZE) break; let q; try { q = await cousin(c, `${SEED}:${today}`, round); } catch { continue; } const k = q && q.prompt + q.lead?.text; if (q && !seen.has(k)) { seen.add(k); qs.push(q); } }
  if (!qs.length) { flash('Nothing to check yet.'); return; }
  RUN = { mode: 'checkup', qs, i: 0, results: [], misses: 0 }; enter();
 }
@@ -49,6 +52,7 @@ function onPick(pos){ const q = RUN.qs[RUN.i]; if (RUN.q.done) return; RUN.q.pic
 /** Tap questions: the tapped words must be exactly the answer words. Spell questions: exactly the word. */
 function onCheck(){
  const q = RUN.qs[RUN.i], Q = RUN.q; if (Q.done) return;
+ if (q.type === 'spell' && !validSpell(q)) { flash('This word could not load. Go back to Notebook and try again.'); return; }
  if (q.type === 'order') { if (!Q.seq.length) return; Q.picked = 0; const ok = Q.seq.length === q.answer.length && Q.seq.every((v, i) => v === q.answer[i]); answer(ok, Q.seq.map(i => q.tokens[i]).join(' ')); return; }
  if (q.type === 'tap') { const a = [...q.answer].sort((x, y) => x - y), b = [...Q.sel].sort((x, y) => x - y); if (!b.length) return; Q.picked = 0; answer(a.length === b.length && a.every((v, i) => v === b[i]), b.map(i => q.tokens[i]).join(' ')); return; }
  const typed = (document.querySelector('#spell')?.value || '').trim(); if (!typed) return; Q.typed = typed; Q.picked = 0;

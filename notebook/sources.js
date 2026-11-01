@@ -13,6 +13,7 @@ import {STAGES, EXTRAS} from '../daily-comprehension/content.js?v=dc-1';
 import {ITEMS} from '../sentence-decoder/items.js?v=dc-1';
 import {PASSAGES as G1} from '../grade-journey/content-g1.js?v=gj-2';
 import {PASSAGES as G2} from '../grade-journey/content-g2.js?v=gj-2';
+import {repairSpellingCard} from './spelling-questions.js?v=nb-spell-1';
 
 export function seeded(str){ let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return () => { h = h + 0x6d2b79f5 >>> 0; let t = h; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 export function shuffle(xs, rng){ const a = xs.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -147,7 +148,7 @@ function arcadeQ(c, g){
 }
 const arcade = {
  build(c, rng){
-  const X = c.extra; if (!X?.orig) return null;
+  const X = c.skill === 'spell' ? repairSpellingCard(c, rng) : c.extra; if (!X?.orig) return null;
   const mix = q => { if (q.type || !q.opts) return q; const o = shuffle(q.opts.map((x, i) => ({ ...x, ok: i === q.right })), rng); return { ...q, opts: o.map(({ x }) => ({ x })), right: o.findIndex(x => x.ok) }; };
   return { original: arcadeQ(c, mix(X.orig)), variations: shuffle(X.same || [], rng).slice(0, 3).map(q => arcadeQ(c, mix(q))), twist: (X.twist || []).length ? arcadeQ(c, mix(shuffle(X.twist, rng)[0])) : null };
  },

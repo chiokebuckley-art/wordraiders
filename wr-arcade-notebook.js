@@ -6,6 +6,7 @@
 (function(){
  var base = (document.currentScript && document.currentScript.src) || location.href;
  var nbUrl = new URL('wr-notebook.js?v=nb-2', base).href, last = {};
+ var spellUrl = new URL('notebook/spelling-questions.js?v=nb-spell-1', base).href;
  function shuffle(a){ a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
  function save(m){ import(nbUrl).then(function(N){ N.miss(m); }).catch(function(){}); }
  function once(key){ var now = Date.now(); if (last[key] && now - last[key] < 2500) return false; last[key] = now; return true; }
@@ -50,14 +51,14 @@
  }
 
  // ---- Spelling: word = { id, word, meaning, sentence, crystal }, crystals = the spelling crystals in order ----
- function spellOf(w){ return { type: 'spell', word: w.word, meaning: w.meaning || '', sentence: w.sentence || '' }; }
  function spell(a){
-  var w = a.word, C = a.crystals || [], i = -1; for (var j = 0; j < C.length; j++) if (C[j].id === w.crystal) { i = j; break; }
+  var w = a.word;
   if (!once('w:' + w.id)) return;
-  var c = C[i], taught = function(cr){ return ((cr && cr.words) || []).filter(function(x){ return !x.heldOut && x.id !== w.id; }); };
-  var same = shuffle(taught(c)).slice(0, 8).map(spellOf), twist = shuffle(taught(C[i - 1]).concat(i > 0 ? [] : taught(C[i + 1]))).slice(0, 4).map(spellOf);
-  var o = spellOf(w);
-  save({ src: 'arcade', ref: 'spell:' + w.id, skill: 'spell', label: w.word + (c && c.pattern ? ' (' + c.pattern + ')' : ''), prompt: 'Spell the word you hear: ' + (w.sentence || w.word), given: a.attempt, right: w.word, lookalike: a.verdict && a.verdict.category === 'meaning', extra: { game: 'spell', orig: o, same: same, twist: twist } });
+  import(spellUrl).then(function(S){
+   var extra = S.spellingExtra(w.id); if (!extra || !extra.same.length) return;
+   var c = (a.crystals || []).find(function(c){ return c.id === w.crystal; });
+   save({ src: 'arcade', ref: 'spell:' + w.id, skill: 'spell', label: w.word + (c && c.pattern ? ' (' + c.pattern + ')' : ''), prompt: 'Spell the word you hear: ' + (w.sentence || w.word), given: a.attempt, right: w.word, lookalike: a.verdict && a.verdict.category === 'meaning', extra: extra });
+  }).catch(function(){});
  }
 
  // ---- Syntax Arcade: q = { topic, kind: choose|repair|mark|build, sentence, prompt, options, answer, explain }, bank = the topic's questions ----
