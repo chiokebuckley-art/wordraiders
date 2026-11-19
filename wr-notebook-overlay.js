@@ -2,24 +2,27 @@
 // the main app's). The Today row and the Library tile call it; the old ./notebook/ address sends players back here
 // with a one-time flag (sessionStorage wr-nb-open) and the Notebook opens. Closing it (← WordRaiders, Escape, or the
 // phone's Back) returns to the main app and refreshes Home so the Today row shows the new state. Home also gets a
-// "📒 My Notebook" bar above Today.
+// "📒 My Notebook" bar above Today, and a "🧠 Reading Intelligence" bar that opens the Reading Intelligence Academy
+// (ria/) the same way.
 (function(){
  var base = (document.currentScript && document.currentScript.src) || location.href;
- var page = new URL('notebook/', base).href, box = null, pushed = false;
+ var page = new URL('notebook/', base).href, academy = new URL('ria/', base).href, box = null, pushed = false;
  function refresh(){ try { window.dispatchEvent(new HashChangeEvent('hashchange')); } catch (e) {} }
  function close(fromPop){
   if (!box) return; box.remove(); box = null; document.documentElement.style.overflow = '';
   if (pushed && !fromPop) { pushed = false; history.back(); } else pushed = false;
   setTimeout(refresh, 0); setTimeout(homeBar, 300);
  }
+ // mode: 'today' / 'home' (Notebook) or 'ria' / 'ria-today' (Reading Intelligence Academy).
  function open(mode){
   if (box) return;
+  var ria = /^ria/.test(mode || '');
   box = document.createElement('div'); box.id = 'wr-notebook-layer';
-  box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'My Notebook');
+  box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', ria ? 'Reading Intelligence Academy' : 'My Notebook');
   box.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:#0b1b2b;';
   var f = document.createElement('iframe');
-  f.src = page + '?embed=1' + (mode === 'today' ? '&today=1' : '');
-  f.title = 'My Notebook'; f.allow = 'autoplay';
+  f.src = ria ? academy + '?embed=1' + (mode === 'ria-today' ? '&go=1' : '') : page + '?embed=1' + (mode === 'today' ? '&today=1' : '');
+  f.title = ria ? 'Reading Intelligence Academy' : 'My Notebook'; f.allow = 'autoplay';
   f.style.cssText = 'border:0;width:100%;height:100%;display:block;background:#0b1b2b;';
   box.appendChild(f); document.body.appendChild(box); document.documentElement.style.overflow = 'hidden';
   try { history.pushState({ wrNotebook: 1 }, '', location.href); pushed = true; } catch (e) {}
@@ -43,9 +46,16 @@
   if (due && f < 3) return { text: (Math.min(3, f + due) - f) + ' to fix', hot: true };
   return { text: open ? 'Check-up' : 'All cleared ✓', hot: !!open };
  }
- var bar = null;
+ var bar = null, rbar = null;
+ function riaStatus(){
+  var M = null; try { M = JSON.parse(localStorage.getItem('wr-li-meta.' + pid()) || 'null'); } catch (e) {}
+  if (!M || !M.baseline) return { text: 'Start', hot: true };
+  var k = day(), due = (M.schedule || []).filter(function(s){ return !s.doneAt && s.due <= k; }).length;
+  var doneToday = (M.sessions || []).some(function(s){ var d = new Date(s.at); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') === k; });
+  return due ? { text: due + ' check' + (due > 1 ? 's' : '') + ' due', hot: true } : doneToday ? { text: 'Done today ✓', hot: false } : { text: 'Next passage', hot: true };
+ }
  function homeBar(){
-  if (!/^#\/home/.test(location.hash || '#/home') || box || !pid()) { if (bar && bar.parentNode) bar.remove(); return; }
+  if (!/^#\/home/.test(location.hash || '#/home') || box || !pid()) { if (bar && bar.parentNode) bar.remove(); if (rbar && rbar.parentNode) rbar.remove(); return; }
   var head = [].slice.call(document.querySelectorAll('.sl-section-head')).find(function(e){ return /TODAY ·/.test(e.textContent || ''); });
   if (!head || !head.parentNode) return;
   if (!bar) {
@@ -57,6 +67,15 @@
   bar.innerHTML = '<span style="font-size:22px" aria-hidden="true">📒</span><span style="flex:1">My Notebook</span><span style="font-size:14px;padding:4px 10px;border-radius:999px;background:' + (st.hot ? '#ff9f43;color:#2a1600' : '#ffffff14;color:#cfe0f0') + '">' + st.text + ' ▸</span>';
   bar.setAttribute('aria-label', 'My Notebook: ' + st.text);
   if (bar.nextSibling !== head || bar.parentNode !== head.parentNode) head.parentNode.insertBefore(bar, head);
+  // "🧠 Reading Intelligence" bar, just above the Notebook bar.
+  if (!rbar) {
+   rbar = document.createElement('button'); rbar.type = 'button'; rbar.id = 'wr-ria-home'; rbar.style.cssText = bar.style.cssText.replace('#ff9f4366', '#4cc9f066');
+   rbar.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); open('ria'); });
+  }
+  var rs = riaStatus();
+  rbar.innerHTML = '<span style="font-size:22px" aria-hidden="true">🧠</span><span style="flex:1">Reading Intelligence</span><span style="font-size:14px;padding:4px 10px;border-radius:999px;background:' + (rs.hot ? '#4cc9f0;color:#04202c' : '#ffffff14;color:#cfe0f0') + '">' + rs.text + ' ▸</span>';
+  rbar.setAttribute('aria-label', 'Reading Intelligence Academy: ' + rs.text);
+  if (rbar.nextSibling !== bar) head.parentNode.insertBefore(rbar, bar);
  }
  setInterval(homeBar, 800); window.addEventListener('hashchange', function(){ setTimeout(homeBar, 50); });
 
